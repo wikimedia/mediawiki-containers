@@ -17,7 +17,12 @@ mediawiki:
     - MEDIAWIKI_ADMIN_USER=admin
     - MEDIAWIKI_ADMIN_PASS=rosebud
     - MEDIAWIKI_UPDATE=true
-    - MEDIAWIKI_SLEEP=20
+    # TODO: Replace sleep with DB socket polling in container. Something like this:
+    # while [ `nc $MEDIAWIKI_DB_HOST $MEDIAWIKI_DB_PORT < /dev/null; echo $?` != 0 ] ; do
+    #   echo 'waiting for mysql...' ;
+    #   sleep 1 ;
+    # done
+    - MEDIAWIKI_SLEEP=15
     - MEDIAWIKI_VERSION=1.25.2
     - MEDIAWIKI_DB_USER=root
     - MEDIAWIKI_DB_HOST=mysql
