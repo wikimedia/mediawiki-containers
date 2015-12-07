@@ -1,0 +1,35 @@
+# Run MediaWiki, RESTBase & Parsoid using `docker-compose up`
+
+
+mediawiki:
+  image: benhutchins/mediawiki
+  ports:
+    - "8000:80"
+  links:
+    - mysql
+    - node-services
+  volumes:
+    - /var/lib/mediawiki-docker-compose/mediawiki-core:/data:rw
+  environment:
+    - MEDIAWIKI_SITE_SERVER=//localhost:8000
+    - MEDIAWIKI_SITE_NAME=MediaWiki
+    - MEDIAWIKI_SITE_LANG=en
+    - MEDIAWIKI_ADMIN_USER=admin
+    - MEDIAWIKI_ADMIN_PASS=rosebud
+    - MEDIAWIKI_UPDATE=true
+    - MEDIAWIKI_SLEEP=20
+    - MEDIAWIKI_VERSION=1.25.2
+    - MEDIAWIKI_DB_USER=root
+    - MEDIAWIKI_DB_HOST=mysql
+
+mysql:
+  image: mysql
+  volumes:
+    - /var/lib/mediawiki-docker-compose/mediawiki-mysql:/var/lib/mysql:rw
+  environment:
+    - MYSQL_ROOT_PASSWORD=password
+
+node-services:
+  image: wikimedia/mediawiki-node-services
+  volumes:
+    - /var/lib/mediawiki-docker-compose/node-services:/data
