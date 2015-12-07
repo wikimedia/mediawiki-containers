@@ -11,7 +11,7 @@ mediawiki:
   volumes:
     - /var/lib/mediawiki-docker-compose/mediawiki-core:/data:rw
   environment:
-    - MEDIAWIKI_SITE_SERVER=//localhost:8000
+    - MEDIAWIKI_SITE_SERVER=//localhost
     - MEDIAWIKI_SITE_NAME=MediaWiki
     - MEDIAWIKI_SITE_LANG=en
     - MEDIAWIKI_ADMIN_USER=admin
