@@ -4,7 +4,7 @@
 mediawiki:
   image: benhutchins/mediawiki
   ports:
-    - "8000:80"
+    - "80:80"
   links:
     - mysql
     - node-services
@@ -31,5 +31,9 @@ mysql:
 
 node-services:
   image: wikimedia/mediawiki-node-services
+  # Temporarily expose RB port directly.
+  # TODO: Set up rewrite at /api/rest_v1/.
+  ports:
+    - "7231:7231"
   volumes:
     - /var/lib/mediawiki-docker-compose/node-services:/data

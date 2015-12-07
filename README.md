@@ -19,6 +19,12 @@ All data is stored outside the containers in a host directory:
 ls /var/lib/mediawiki-docker-compose/
 mediawiki-core  mediawiki-mysql  node-services
 ```
+## Usage
+
+```bash
+docker-compose up
+```
+
 ## TODO
 
 This is a fairly early prototype, and not fully functional yet. Next steps:
