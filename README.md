@@ -7,7 +7,9 @@ including VisualEditor, Parsoid, RESTBase, Mathoid & other services.
 
 We are starting three containers:
 
-- An Apache/MediaWiki container.
+- An Apache/MediaWiki container with PHP 5.6 and MediaWiki
+    1.25.3(wikimedia/mediawiki, based on
+    https://github.com/gwicke/docker-mediawiki).
 - A MySQL container, used as the database backend for MediaWiki.
 - A [mediawiki-node-services](https://github.com/gwicke/mediawiki-node-services)
     container, currently running RESTBase and Parsoid in a single node process
@@ -27,16 +29,11 @@ docker-compose up
 
 ## TODO
 
-This is a fairly early prototype, and not fully functional yet. Next steps:
+This is a fairly early prototype. The basic functionality of MediaWiki +
+services is there, but some details about the configuration will likely change
+before this can be used in production.
 
-- Update / parametrize the mediawiki-node-services config to reference the
-    "mediawiki" container by name.
-    - Actually, it turns out that circular `link` dependencies aren't
-        supported in docker-compose right now. This slightly complicates
-        figuring out the mediawiki container's auto-allocated IP. In latest
-        docker this seems to be addressed by service discovery work in
-        https://github.com/docker/docker/pull/14051, but we probably can't
-        rely on that being deployed just yet.
+Next steps:
+
 - Forward `/api/rest_v1/` to RESTBase.
 - Include / configure VisualEditor by default.
-
