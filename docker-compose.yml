@@ -1,12 +1,5 @@
 # Run MediaWiki, RESTBase & Parsoid using `docker-compose up`
 
-dnsdock:
-  image: tonistiigi/dnsdock
-  volumes:
-    - /var/run/docker.sock:/run/docker.sock
-  ports:
-    - 172.17.42.1:53:53/udp
-
 mediawiki:
   image: wikimedia/mediawiki
   ports:
@@ -50,3 +43,13 @@ mysql:
     - /var/lib/mediawiki-docker-compose/mediawiki-mysql:/var/lib/mysql:rw
   environment:
     - MYSQL_ROOT_PASSWORD=password
+
+# Light-weight DNS resolver to allow containers to address each other by name.
+# Docker-compose's `link` mechanism only supports this one way, which is not
+# sufficient for pairs like node-services & mediawiki.
+dnsdock:
+  image: tonistiigi/dnsdock
+  volumes:
+    - /var/run/docker.sock:/run/docker.sock
+  ports:
+    - 172.17.42.1:53:53/udp
