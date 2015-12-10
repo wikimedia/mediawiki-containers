@@ -12,20 +12,24 @@ instructions](https://docs.docker.com/compose/install/) for your distribution.
 The minimum hardware requirements are a KVM or similar VM with 512M RAM. These
 can be had from a variety of vendors for around $5/month. [This
 comparison from ServerBear lists some
-options](http://serverbear.com/compare?Sort=BearScore&Order=desc&Server+Type=VPS&Monthly+Cost=-&HDD=-&RAM=500000000-&BearScore=-&Virtualization=kvm).
+options](http://serverbear.com/compare?Sort=BearScore&Order=desc&Server+Type=VPS&Monthly+Cost=-&HDD=-&RAM=500000000-&BearScore=-&Virtualization=KVM).
 
 ## Description
 
 Running `docker-compose up` in a checkout of this repository will start three
 containers:
 
-- An Apache/MediaWiki container with PHP 5.6 and MediaWiki
-    1.25.3(wikimedia/mediawiki, based on
-    https://github.com/gwicke/docker-mediawiki).
-- A MySQL container, used as the database backend for MediaWiki.
-- A [mediawiki-node-services](https://github.com/gwicke/mediawiki-node-services)
-    container, currently running RESTBase and Parsoid in a single node process
-    for memory efficiency.
+- An Apache/MediaWiki container with PHP 5.6 and MediaWiki 1.25.3
+    using [wikimedia/mediawiki](https://hub.docker.com/r/wikimedia/mediawiki/),
+    built from https://github.com/gwicke/docker-mediawiki.
+- A [MySQL container](https://hub.docker.com/_/mysql/), used as the database
+    backend for MediaWiki.
+- A
+    [wikimedia/mediawiki-node-services](https://hub.docker.com/r/wikimedia/mediawiki-node-services/)
+    container built from
+    [mediawiki-node-services](https://github.com/gwicke/mediawiki-node-services),
+    currently running RESTBase and Parsoid in a single node process for memory
+    efficiency.
 
 After startup, a brand new MediaWiki install will be reachable at
 http://localhost/.
@@ -67,3 +71,5 @@ Next steps:
 - Add more extensions?
 - Use HHVM?
 - Profit.
+
+Tell us about your ideas at https://phabricator.wikimedia.org/T92826. 
