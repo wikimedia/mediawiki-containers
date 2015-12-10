@@ -39,12 +39,17 @@ ls /var/lib/mediawiki-docker-compose/
 mediawiki-core  mediawiki-mysql  node-services
 ```
 
-To reset all state:
+This greatly simplifies backups and upgrades. Update scripts are run on each
+startup, which means that updating to a newer version of the entire setup is
+as easy as:
 
+```bash
+docker-compose pull
+docker-compose up
 ```
-docker-compose rm
-rm -rf /var/lib/mediawiki-docker-compose
-```
+
+Instances can be nuked at any time using `docker-compose rm`, without touching
+the data stored in `/var/lib/mediawiki-docker-compose`.
 
 ## Status & next steps
 
@@ -54,6 +59,11 @@ before this can be used in production.
 
 Next steps:
 
-- Include / configure VisualEditor by default.
+- Hook up VisualEditor out of the box.
+- Update to MediaWiki 1.26.
 - Forward `/api/rest_v1/` to RESTBase.
 - Set up systemd / init scripts to start up the docker-compose setup on boot.
+  - Possibly, also provide a systemd-only startup script that doesn't require docker-compose.
+- Add more extensions?
+- Use HHVM?
+- Profit.
