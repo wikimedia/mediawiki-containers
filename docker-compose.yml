@@ -4,12 +4,14 @@ mediawiki:
   image: wikimedia/mediawiki
   ports:
     - "80:80"
-  dns: 172.17.42.1
+  dns: [172.17.42.1]
   links:
     - mysql
     - node-services
   volumes:
     - /var/lib/mediawiki-docker-compose/mediawiki-core:/data:rw
+    # Inject our specific settings
+    - mediawiki/CustomSettings.php:/data/CustomSettings.php:ro
   environment:
     - MEDIAWIKI_SITE_SERVER=//localhost
     - MEDIAWIKI_SITE_NAME=MediaWiki
@@ -26,7 +28,7 @@ mediawiki:
 
 node-services:
   image: wikimedia/mediawiki-node-services
-  dns: 172.17.42.1
+  dns: [172.17.42.1]
   # Temporarily expose RB port directly.
   # TODO: Set up rewrite at /api/rest_v1/.
   ports:
@@ -38,7 +40,7 @@ node-services:
 
 mysql:
   image: mysql
-  dns: 172.17.42.1
+  dns: [172.17.42.1]
   volumes:
     - /var/lib/mediawiki-docker-compose/mediawiki-mysql:/var/lib/mysql:rw
   environment:
