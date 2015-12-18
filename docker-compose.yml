@@ -8,10 +8,11 @@ mediawiki:
   links:
     - mysql
     - node-services
+    - dnsdock
   volumes:
     - /var/lib/mediawiki-docker-compose/mediawiki-core:/data:rw
     # Inject our specific settings
-    - mediawiki/CustomSettings.php:/data/CustomSettings.php:ro
+    - ./mediawiki:/conf:ro
   environment:
     - MEDIAWIKI_SITE_SERVER=//localhost
     - MEDIAWIKI_SITE_NAME=MediaWiki
@@ -32,6 +33,7 @@ node-services:
   # Temporarily expose RB port directly.
   # TODO: Set up rewrite at /api/rest_v1/.
   ports:
+    - "8142:8142"
     - "7231:7231"
   volumes:
     - /var/lib/mediawiki-docker-compose/node-services:/data

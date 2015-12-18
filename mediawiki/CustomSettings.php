@@ -3,10 +3,10 @@
 /**
  * VisualEditor
  */
-require_once "/usr/src/mediawiki-extensions/VisualEditor/VisualEditor.php";
+require_once "/usr/src/mediawiki/extensions/VisualEditor/VisualEditor.php";
 $wgDefaultUserOptions['visualeditor-enable'] = 1;
 $wgHiddenPrefs[] = 'visualeditor-enable';
-$wgDefaultUserOptions['visualeditor-enable-experimental'] = 1;
+#$wgDefaultUserOptions['visualeditor-enable-experimental'] = 1;
 $wgVirtualRestConfig['modules']['parsoid'] = array(
 	// URL to the Parsoid instance
 	// Use port 8142 if you use the Debian package
