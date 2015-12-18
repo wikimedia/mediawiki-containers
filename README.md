@@ -57,15 +57,20 @@ the data stored in `/var/lib/mediawiki-docker-compose`.
 
 ## Status & next steps
 
-This is a fairly early prototype. The basic functionality of MediaWiki +
-services is there, but some details about the configuration will likely change
-before this can be used in production.
+This is alpha quality software. The basic functionality of MediaWiki, services
+and VisualEditor is there, but some details about the configuration will
+likely change before this can be used in production.
 
-Next steps:
+Done:
 
 - Hook up VisualEditor out of the box.
 - Update to MediaWiki 1.26.
-- Forward `/api/rest_v1/` to RESTBase.
+
+
+Next steps:
+
+- Forward `/api/rest_v1/` to RESTBase & configure RESTBase updates. Enable
+    Wikitext / HTML switching in VE.
 - Set up systemd / init scripts to start up the docker-compose setup on boot.
   - Possibly, also provide a systemd-only startup script that doesn't require docker-compose.
 - Add more extensions?
