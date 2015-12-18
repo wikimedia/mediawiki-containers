@@ -8,6 +8,7 @@ start () {
     set -e
     echo
     echo "Starting DNS container.."
+    docker pull tonistiigi/dnsdock
     docker run -d \
         --name=dnsdock \
         -v /var/run/docker.sock:/run/docker.sock \
@@ -16,6 +17,7 @@ start () {
 
     echo
     echo "Starting mysql container.."
+    docker pull mysql
     docker run -d \
         --name=mysql \
         -v /var/lib/mediawiki-docker-compose/mediawiki-mysql:/var/lib/mysql:rw \
@@ -25,6 +27,7 @@ start () {
 
     echo
     echo "Starting mediawiki container.."
+    docker pull wikimedia/mediawiki
     docker run -d \
         --name=mediawiki \
         -v `pwd`/mediawiki:/conf:ro \
@@ -45,13 +48,13 @@ start () {
 
     echo
     echo "Starting mediawiki-node-services container.."
+    docker pull wikimedia/mediawiki-node-services
     docker run -d \
         --name=mediawiki-node-services \
         -v /var/lib/mediawiki-docker-compose/node-services:/data \
         -e MEDIAWIKI_API_URL=http://mediawiki.docker/api.php \
         --dns "$DNS" \
         -p 8142:8142 \
-        -p 7231:7231 \
         wikimedia/mediawiki-node-services
 
     # Follow the mediawiki container logs
@@ -68,11 +71,14 @@ stop () {
 
 
 if [ -z "$1" ];then
-    echo "Usage: $0 [start|stop]"
+    echo "Usage: $0 [start|stop|restart]"
     exit 1
 elif [ "$1" == "stop" ]; then
     stop
 elif [ "$1" == "start" ]; then
+    start
+elif [ "$1" == "restart" ]; then
+    stop
     start
 else
     echo "Invalid parameter: $1"

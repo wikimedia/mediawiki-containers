@@ -1,13 +1,12 @@
-# mediawiki-docker-compose
+# mediawiki-containers
 
-A prototype docker-compose setup for a fully-featured MediaWiki install
-including VisualEditor, Parsoid, RESTBase, Mathoid & other services.
+Containerized MediaWiki install including VisualEditor, Parsoid, RESTBase,
+Mathoid & other services.
 
 ## Requirements 
 
-You need `docker` and `docker-compose`, which is available in recent distros
-like Debian Sid. Alternatively, you can follow [the Docker install
-instructions](https://docs.docker.com/compose/install/) for your distribution.
+You need `docker` >= 1.6. On a recent Debian distribution (Jessie, Sid), this
+can be installed with `apt-get install docker.io`.
 
 The minimum hardware requirements are a KVM or similar VM with 512M RAM. These
 can be had from a variety of vendors for around $5/month. [This
@@ -16,8 +15,8 @@ options](http://serverbear.com/compare?Sort=BearScore&Order=desc&Server+Type=VPS
 
 ## Description
 
-Running `docker-compose up` in a checkout of this repository will start three
-containers:
+Running `sudo ./mediawiki.sh start` in a checkout of this repository will
+start three containers:
 
 - An Apache/MediaWiki container with PHP 5.6 and MediaWiki 1.25.3
     using [wikimedia/mediawiki](https://hub.docker.com/r/wikimedia/mediawiki/),
@@ -44,16 +43,12 @@ mediawiki-core  mediawiki-mysql  node-services
 ```
 
 This greatly simplifies backups and upgrades. Update scripts are run on each
-startup, which means that updating to a newer version of the entire setup is
-as easy as:
+startup, which means that updating to a newer version of the entire setup is as
+easy as a restart:
 
 ```bash
-docker-compose pull
-docker-compose up
+sudo ./mediawiki.sh restart
 ```
-
-Instances can be nuked at any time using `docker-compose rm`, without touching
-the data stored in `/var/lib/mediawiki-docker-compose`.
 
 ## Status & next steps
 
@@ -78,3 +73,16 @@ Next steps:
 - Profit.
 
 Tell us about your ideas at https://phabricator.wikimedia.org/T92826. 
+
+### Alternative to the shell script: `docker-compose`
+
+This project also provides an equivalent `docker-compose` configuration, which
+can be used by executing `docker-compose up`. A nice thing about using
+docker-compose is a very slightly cleaner configuration, and merged output from
+all containers. 
+
+A downside is its lacking support for parametrizing the docker network IP. It
+turns out that docker on older distributions like Jessie uses a different
+network than newer distros, which makes it difficult to support DNS resolution
+in both using the same `docker-compose` config. The provided configuration
+assumes a recent distribution, so won't work on Jessie out of the box.
