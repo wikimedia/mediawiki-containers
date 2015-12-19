@@ -16,14 +16,15 @@ start () {
     DNS=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' dnsdock)
 
     echo
-    echo "Starting mysql container.."
-    docker pull mysql
+    echo "Starting mysql(mariadb) container.."
+    docker pull mariadb
     docker run -d \
         --name=mysql \
+        -e SERVICE_NAME=mysql \
         -v /var/lib/mediawiki-containers/mediawiki-mysql:/var/lib/mysql:rw \
         -e MYSQL_ROOT_PASSWORD=password \
         --dns "$DNS" \
-        mysql
+        mariadb
 
     echo
     echo "Starting mediawiki container.."
