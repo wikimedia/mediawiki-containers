@@ -15,7 +15,7 @@ options](http://serverbear.com/compare?Sort=BearScore&Order=desc&Server+Type=VPS
 
 ## Description
 
-Running `sudo ./mediawiki start` in a checkout of this repository will
+Running `sudo ./mediawiki-containers start` in a checkout of this repository will
 start four containers:
 
 - An Apache/MediaWiki container with PHP 5.6 and MediaWiki 1.25.3
@@ -48,7 +48,7 @@ startup, which means that updating to a newer version of the entire setup is as
 easy as a restart:
 
 ```bash
-sudo ./mediawiki restart
+sudo ./mediawiki-containers restart
 ```
 
 ## Status & next steps
