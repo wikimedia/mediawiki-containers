@@ -15,8 +15,8 @@ options](http://serverbear.com/compare?Sort=BearScore&Order=desc&Server+Type=VPS
 
 ## Description
 
-Running `sudo ./mediawiki.sh start` in a checkout of this repository will
-start three containers:
+Running `sudo ./mediawiki start` in a checkout of this repository will
+start four containers:
 
 - An Apache/MediaWiki container with PHP 5.6 and MediaWiki 1.25.3
     using [wikimedia/mediawiki](https://hub.docker.com/r/wikimedia/mediawiki/),
@@ -29,6 +29,7 @@ start three containers:
     [mediawiki-node-services](https://github.com/gwicke/mediawiki-node-services),
     currently running RESTBase and Parsoid in a single node process for memory
     efficiency.
+- A small DNS resolver for service discovery.
 
 After startup, a brand new MediaWiki install will be reachable at
 http://localhost/.
@@ -38,8 +39,8 @@ http://localhost/.
 All data is stored outside the containers in a host directory:
 
 ```bash
-ls /var/lib/mediawiki-docker-compose/
-mediawiki-core  mediawiki-mysql  node-services
+ls /var/lib/mediawiki-containers/
+mediawiki  mysql  node-services
 ```
 
 This greatly simplifies backups and upgrades. Update scripts are run on each
@@ -47,7 +48,7 @@ startup, which means that updating to a newer version of the entire setup is as
 easy as a restart:
 
 ```bash
-sudo ./mediawiki.sh restart
+sudo ./mediawiki restart
 ```
 
 ## Status & next steps
