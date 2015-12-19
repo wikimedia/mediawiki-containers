@@ -5,8 +5,10 @@ Mathoid & other services.
 
 ## Requirements 
 
-You need `docker` >= 1.6. On a recent Debian distribution (Jessie, Sid), this
-can be installed with `apt-get install docker.io`.
+You need `docker` >= 1.6. On a recent Debian or Ubuntu distribution (Jessie,
+Sid), this can be installed with `apt-get install docker.io`. See [the Docker
+install instructions](https://docs.docker.com/engine/installation/) for other
+platforms.
 
 The minimum hardware requirements are a KVM or similar VM with 512M RAM. These
 can be had from a variety of vendors for around $5/month. [This
