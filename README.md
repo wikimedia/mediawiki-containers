@@ -20,7 +20,7 @@ options](http://serverbear.com/compare?Sort=BearScore&Order=desc&Server+Type=VPS
 Running `sudo ./mediawiki-containers start` in a checkout of this repository will
 start four containers:
 
-- An Apache/MediaWiki container with PHP 5.6 and MediaWiki 1.25.3
+- An Apache/MediaWiki container with PHP 5.6 and MediaWiki 1.27-wmf9
     using [wikimedia/mediawiki](https://hub.docker.com/r/wikimedia/mediawiki/),
     built from https://github.com/gwicke/docker-mediawiki.
 - A [MySQL container](https://hub.docker.com/_/mysql/), used as the database
@@ -62,7 +62,7 @@ likely change before this can be used in production.
 Done:
 
 - Hook up VisualEditor out of the box.
-- Update to MediaWiki 1.26.
+- Update to MediaWiki ~~1.26~~ 1.27-wmf9.
 
 
 Next steps:
