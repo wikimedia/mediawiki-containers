@@ -174,9 +174,11 @@ ask_config() {
     conf=/var/lib/mediawiki-containers/config
     if [ ! -f $conf ];then
         # Ask a couple of config questions & save a config file.
-        read -p "Please enter the domain your wiki will be reachable at: " domain
+        read -p "Please enter the domain your wiki will be reachable at: " \
+            domain </dev/tty 
         while true; do
-            read -p "Should we enable automatic nightly code updates? [yn]: " autoupdate
+            read -p "Should we enable automatic nightly code updates? [yn]: " \
+                autoupdate </dev/tty
             case $autoupdate in
                 [Yy]* ) autoupdate=true; break;;
                 [Nn]* ) autoupdate=false; break;;
