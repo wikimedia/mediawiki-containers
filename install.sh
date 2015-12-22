@@ -238,8 +238,10 @@ install() {
         echo "Starting mediawiki-containers.."
         service mediawiki-containers restart
 
+        echo "Starting up containers.."
+        echo "Your wiki should shortly be available at http://$MEDIAWIKI_DOMAIN/."
+        echo 'To follow the startup progress, run `journalctl -f`.'
         echo "[OK] All done."
-        echo "Your wiki should now be available at http://localhost/."
     fi
 }
 install "$@"
