@@ -134,19 +134,6 @@ check_docker_version() {
     fi
 }
 
-install_docker() {
-    if hash docker 2>/dev/null;then
-        docker_version=$(docker --version | awk '{print $3}')
-        check_docker_version
-        echo "[OK] Found docker $docker_version"
-    else
-        docker_version=$(apt-cache show docker.io | grep Version | head -1 | awk '{print $2}') 
-        check_docker_version
-        echo "Installing docker.io.."
-        apt-get install -y docker.io
-    fi
-}
-
 install_git() {
     if ! hash git 2>/dev/null;then
         echo "Installing git.."
@@ -169,12 +156,25 @@ check_out_mediawiki_containers() {
     cd "$srcdir"
 }
 
+install_docker() {
+    if hash docker 2>/dev/null;then
+        docker_version=$(docker --version | awk '{print $3}')
+        check_docker_version
+        echo "[OK] Found docker $docker_version"
+    else
+        docker_version=$(apt-cache show docker.io | grep Version | head -1 | awk '{print $2}') 
+        check_docker_version
+        echo "Installing docker.io.."
+        apt-get install -y docker.io
+    fi
+}
+
 ask_config() {
     mkdir -p /var/lib/mediawiki-containers
     conf=/var/lib/mediawiki-containers/config
     if [ ! -f $conf ];then
         # Ask a couple of config questions & save a config file.
-        read -p "Please enter the domain your wiki will be reachable as: " domain
+        read -p "Please enter the domain your wiki will be reachable at: " domain
         while true; do
             read -p "Should we enable automatic nightly code updates? [yn]: " autoupdate
             case $autoupdate in
@@ -209,32 +209,37 @@ enable_automatic_updates() {
 
 # Main setup routine.
 install() {
-    # Make sure we have docker.
-    install_docker
+    if [ "$1" != '--continue' ];then
+        # Make sure we have git.
+        install_git
 
-    # Make sure we have git.
-    install_git
+        # Clone / update the mediawiki-containers repository.
+        check_out_mediawiki_containers
 
-    # Clone the mediawiki-containers repository.
-    check_out_mediawiki_containers
+        # Switch to the latest installer.
+        exec /usr/local/src/mediawiki-containers/install.sh "--continue"
+    else
+        # Make sure we have docker.
+        install_docker
 
-    # Ask some configuration question.
-    ask_config
+        # Ask some configuration question.
+        ask_config
 
-    # Install a systemd unit or init script.
-    install_systemd_init
+        # Install a systemd unit or init script.
+        install_systemd_init
 
-    # Set up a cron job for automatic updates.
-    if [ "$AUTO_UPDATE" = 'true' ];then
-        enable_automatic_updates
+        # Set up a cron job for automatic updates.
+        if [ "$AUTO_UPDATE" = 'true' ];then
+            enable_automatic_updates
+        fi
+
+        # TODO: Prompt for the domain name & set up letsencrypt & wgServer
+
+        echo "Starting mediawiki-containers.."
+        service mediawiki-containers restart
+
+        echo "[OK] All done."
+        echo "Your wiki should now be available at http://localhost/."
     fi
-
-    # TODO: Prompt for the domain name & set up letsencrypt & wgServer
-
-    echo "Starting mediawiki-containers.."
-    service mediawiki-containers restart
-
-    echo "[OK] All done."
-    echo "Your wiki should now be available at http://localhost/."
 }
 install
