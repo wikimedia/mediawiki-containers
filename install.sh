@@ -169,6 +169,26 @@ check_out_mediawiki_containers() {
     cd "$srcdir"
 }
 
+ask_config() {
+    mkdir -p /var/lib/mediawiki-containers
+    conf=/var/lib/mediawiki-containers/config
+    if [ ! -f $conf ];then
+        # Ask a couple of config questions & save a config file.
+        read -p "Please enter the domain your wiki will be reachable as: " domain
+        while true; do
+            read -p "Should we enable automatic nightly code updates? [yn]: " autoupdate
+            case $autoupdate in
+                [Yy]* ) autoupdate=true; break;;
+                [Nn]* ) autoupdate=false; break;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        done
+        echo "MEDIAWIKI_DOMAIN=\"$domain\"" > $conf
+        echo "AUTO_UPDATE=$autoupdate" >> $conf
+    fi
+    source /var/lib/mediawiki-containers/config
+}
+
 install_systemd_init() {
     pwd
     if hash systemd 2>/dev/null; then
@@ -198,16 +218,21 @@ install() {
     # Clone the mediawiki-containers repository.
     check_out_mediawiki_containers
 
+    # Ask some configuration question.
+    ask_config
+
     # Install a systemd unit or init script.
     install_systemd_init
 
     # Set up a cron job for automatic updates.
-    enable_automatic_updates
+    if [ "$AUTO_UPDATE" = 'true' ];then
+        enable_automatic_updates
+    fi
 
     # TODO: Prompt for the domain name & set up letsencrypt & wgServer
 
     echo "Starting mediawiki-containers.."
-    service mediawiki-containers start
+    service mediawiki-containers restart
 
     echo "[OK] All done."
     echo "Your wiki should now be available at http://localhost/."

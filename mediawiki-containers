@@ -4,6 +4,17 @@
 # Alternative to docker-compose, with automatic docker subnet detection to make
 # this work on jessie or sid.
 
+if [ -d /var/lib/mediawiki-containers \
+    -a -f /var/lib/mediawiki-containers/config ]; then
+    source /var/lib/mediawiki-containers/config
+fi
+
+# Set up defaults
+if [ -z "$MEDIAWIKI_DOMAIN" ]; then
+    # Ewww..
+    MEDIAWIKI_DOMAIN="localhost"
+fi
+
 start () {
     set -e
     echo
@@ -33,7 +44,7 @@ start () {
         --name=mediawiki \
         -v `pwd`/conf/mediawiki:/conf:ro \
         -v /var/lib/mediawiki-containers/mediawiki-core:/data:rw \
-        -e MEDIAWIKI_SITE_SERVER=//localhost \
+        -e MEDIAWIKI_SITE_SERVER="//$MEDIAWIKI_DOMAIN" \
         -e MEDIAWIKI_SITE_NAME=MediaWiki \
         -e MEDIAWIKI_SITE_LANG=en \
         -e MEDIAWIKI_ADMIN_USER=admin \
