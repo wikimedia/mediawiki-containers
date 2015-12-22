@@ -176,6 +176,7 @@ install_systemd_init() {
         # Install systemd unit
         echo "Installing systemd unit file /etc/systemd/system/mediawiki-containers.."
         cp ./init/mediawiki-containers.service /etc/systemd/system
+        systemctl daemon-reload
     else
         echo "Installing init script /etc/init.d/mediawiki-containers.."
     fi
