@@ -122,8 +122,8 @@ if test "x$platform" = "x"; then
 fi
 
 
-if [ "$platform" != "debian" -a "$platform" != "ubuntu" ]; then
-	echo "Only Debian and Ubuntu are currently supported!"
+if [ "$platform" != "debian" ]; then
+	echo "Only Debian is currently supported!"
 	exit 1;
 fi
 
