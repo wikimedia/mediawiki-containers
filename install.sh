@@ -122,8 +122,8 @@ if test "x$platform" = "x"; then
 fi
 
 
-if [ "$platform" != "debian" ]; then
-	echo "Only Debian is currently supported!"
+if [ "$platform" != "debian" -a "$platform" != "ubuntu" ]; then
+	echo "Only Debian and Ubuntu are currently supported!"
 	exit 1;
 fi
 
@@ -197,7 +197,10 @@ install_systemd_init() {
         ln -sf "`pwd`/init/mediawiki-containers.service" /etc/systemd/system
         systemctl daemon-reload
     else
-        echo "Installing init script /etc/init.d/mediawiki-containers.."
+        echo "FIXME: Support init scripts on distributions without systemd!"
+        report_bug
+        exit 1
+        # echo "Installing init script /etc/init.d/mediawiki-containers.."
     fi
 }
 
