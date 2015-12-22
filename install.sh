@@ -183,7 +183,7 @@ install_systemd_init() {
 
 enable_automatic_updates() {
     # Link a job restarting the service to /etc/cron.daily.
-    ln -sf "`pwd`/cron/mediawiki-containers" /etc/crond.daily
+    ln -sf "`pwd`/cron/mediawiki-containers" /etc/cron.daily
 }
 
 
