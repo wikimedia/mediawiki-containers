@@ -174,16 +174,17 @@ install_systemd_init() {
     if hash systemd 2>/dev/null; then
         # Install systemd unit
         echo "Installing systemd unit file /etc/systemd/system/mediawiki-containers.."
-        cp ./init/mediawiki-containers.service /etc/systemd/system
+        ln -s ./init/mediawiki-containers.service /etc/systemd/system
         systemctl daemon-reload
     else
         echo "Installing init script /etc/init.d/mediawiki-containers.."
     fi
 }
 
-# enable_automatic_updates() {
-#     # TODO: Copy a job restarting the service to /etc/cron.daily.
-# }
+enable_automatic_updates() {
+    # Link a job restarting the service to /etc/cron.daily.
+    ln -s ./cron/mediawiki-containers /etc/crond.daily
+}
 
 
 # Main setup routine.
@@ -200,8 +201,8 @@ install() {
     # Install a systemd unit or init script.
     install_systemd_init
 
-    # TODO: Set up a cron job for automatic updates.
-    # enable_automatic_updates
+    # Set up a cron job for automatic updates.
+    enable_automatic_updates
 
     # TODO: Prompt for the domain name & set up letsencrypt & wgServer
 
