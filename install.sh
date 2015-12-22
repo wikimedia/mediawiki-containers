@@ -220,7 +220,8 @@ install() {
         check_out_mediawiki_containers
 
         # Switch to the latest installer.
-        exec /usr/local/src/mediawiki-containers/install.sh '--continue'
+        /usr/local/src/mediawiki-containers/install.sh --continue
+        exit $?
     else
         # Make sure we have docker.
         install_docker
