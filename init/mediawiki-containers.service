@@ -5,8 +5,8 @@ Requires=docker.service
 
 [Service]
 TimeoutStartSec=0
-ExecStart=/usr/local/src/mediawiki-containers/mediawiki start
-ExecStop=/usr/local/src/mediawiki-containers/mediawiki stop
+ExecStart=/usr/local/src/mediawiki-containers/mediawiki-continers start
+ExecStop=/usr/local/src/mediawiki-containers/mediawiki-containers stop
 
 [Install]
 WantedBy=multi-user.target
