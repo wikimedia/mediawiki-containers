@@ -1,16 +1,17 @@
 #!/bin/bash
 
 # mediawiki-containers installer
+# 
+# Usage:
+# curl https://raw.githubusercontent.com/wikimedia/mediawiki-containers/master/install.sh \
+#   | sudo bash
+#
 
 set -e
 
 # Output the instructions to report bug about this script
 report_bug() {
-  echo "Version: $version"
-  echo ""
-  echo "Please file a Bug Report at https://github.com/chef/omnitruck/issues/new"
-  echo "Alternatively, feel free to open a Support Ticket at https://www.chef.io/support/tickets"
-  echo "More Chef support resources can be found at https://www.chef.io/support"
+  echo "Please file a Bug Report at https://github.com/wikimedia/mediawiki-containers/issues/new"
   echo ""
   echo "Please include as many details about the problem as possible i.e., how to reproduce"
   echo "the problem (if possible), type of the Operating System and its version, etc.,"
@@ -18,8 +19,6 @@ report_bug() {
   echo ""
 }
 
-# Usage: curl https://getmediawiki.org/setup.sh | bash
-#
 # Platform and Platform Version detection
 #
 # NOTE: This should now match ohai platform and platform_version matching.
@@ -186,6 +185,8 @@ install_systemd_init() {
 #     # TODO: Copy a job restarting the service to /etc/cron.daily.
 # }
 
+
+# Main setup routine.
 install() {
     # Make sure we have docker.
     install_docker
