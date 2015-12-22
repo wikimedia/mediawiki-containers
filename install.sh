@@ -174,7 +174,7 @@ install_systemd_init() {
     if hash systemd 2>/dev/null; then
         # Install systemd unit
         echo "Installing systemd unit file /etc/systemd/system/mediawiki-containers.."
-        ln -s ./init/mediawiki-containers.service /etc/systemd/system
+        ln -sf ./init/mediawiki-containers.service /etc/systemd/system
         systemctl daemon-reload
     else
         echo "Installing init script /etc/init.d/mediawiki-containers.."
@@ -183,7 +183,7 @@ install_systemd_init() {
 
 enable_automatic_updates() {
     # Link a job restarting the service to /etc/cron.daily.
-    ln -s ./cron/mediawiki-containers /etc/crond.daily
+    ln -sf ./cron/mediawiki-containers /etc/crond.daily
 }
 
 
