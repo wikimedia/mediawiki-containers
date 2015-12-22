@@ -217,7 +217,7 @@ install() {
         check_out_mediawiki_containers
 
         # Switch to the latest installer.
-        exec /usr/local/src/mediawiki-containers/install.sh "--continue"
+        exec /usr/local/src/mediawiki-containers/install.sh '--continue'
     else
         # Make sure we have docker.
         install_docker
@@ -242,4 +242,4 @@ install() {
         echo "Your wiki should now be available at http://localhost/."
     fi
 }
-install
+install "$@"
