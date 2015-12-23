@@ -137,13 +137,17 @@ install() {
 
     echo
     echo "Starting mediawiki-containers.."
-    stop
-    start
+    service mediawiki-containers restart
 
     echo "Starting up containers.."
     echo
     echo "Your wiki should soon be available at http://$MEDIAWIKI_DOMAIN/."
-    echo 'To follow the startup progress, run `docker logs -f mediawiki`.'
+    echo 'To follow the startup progress, run'
+    echo '  - `docker logs -f mediawiki` for MediaWiki,'
+    echo '  - `docker logs -f mysql` for MySQL,'
+    echo '  - `docker logs -f mediawiki-node-services` for services.'
+    echo
+    echo 'For general OS errors, see `journalctl -f`.'
 }
 
 if [ "$1" == "stop" ]; then
