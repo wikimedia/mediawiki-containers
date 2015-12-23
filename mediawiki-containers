@@ -36,7 +36,7 @@ start () {
     docker run -d \
         --name=mysql \
         -e SERVICE_NAME=mysql \
-        -v $DATADIR/mediawiki-mysql:/var/lib/mysql:rw \
+        -v $DATADIR/mysql:/var/lib/mysql:rw \
         -e MYSQL_ROOT_PASSWORD=password \
         --dns "$DNS" \
         mariadb
@@ -47,7 +47,7 @@ start () {
     docker run -d \
         --name=mediawiki \
         -v `pwd`/conf/mediawiki:/conf:ro \
-        -v $DATADIR/mediawiki-core:/data:rw \
+        -v $DATADIR/mediawiki:/data:rw \
         -e MEDIAWIKI_SITE_SERVER="//$MEDIAWIKI_DOMAIN" \
         -e MEDIAWIKI_SITE_NAME=MediaWiki \
         -e MEDIAWIKI_SITE_LANG=en \
