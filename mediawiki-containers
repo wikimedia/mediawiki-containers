@@ -114,7 +114,7 @@ usage() {
 install() {
     while true; do
         read -p "Would you proceed to install / update mediawiki-containers? (y/n): " \
-            yn
+            yn </dev/tty
         case $yn in
             [Yy]* ) break;;
             [Nn]* ) echo "Okay, aborting."; exit 1;;
