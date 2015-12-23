@@ -113,7 +113,7 @@ usage() {
 
 install() {
     while true; do
-        read -p "Would you proceed to install / update mediawiki-containers? (y/n): " \
+        read -p "Proceed to install / update mediawiki-containers? (y/n): " \
             yn </dev/tty
         case $yn in
             [Yy]* ) break;;
