@@ -72,8 +72,8 @@ start () {
         wikimedia/mediawiki-node-services
 
     # Follow the mediawiki container logs
-    set -o pipefail
-    docker logs -f mediawiki | sed '/^AH00558:/ q'
+    #set -o pipefail
+    #docker logs -f mediawiki | sed '/^AH00558:/ q' || exit 1)
 }
 
 stop () {
@@ -134,6 +134,7 @@ install() {
     source ./lib/install.sh
     do_install
 
+    echo
     echo "Starting mediawiki-containers.."
     stop
     start
