@@ -144,7 +144,7 @@ install() {
     echo
     echo 'Following startup via `journalctl -f -u mediawiki-containers`.'
     echo
-    journalctl -f -u mediawiki-containers | sed '/: Done in /q'
+    journalctl -f -u mediawiki-containers -n 0 | sed '/: Done in /q'
     # Get the last line, too
     lastline=$(journalctl -u mediawiki-containers | tail -1 | grep AH00558)
     if [ -z "$lastline" ];then
