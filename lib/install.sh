@@ -145,7 +145,7 @@ install_docker() {
 }
 
 ask_config() {
-    mkdir -p $DATADIR/data
+    mkdir -p $DATADIR
     conf=$DATADIR/config
     if [ ! -f $conf ];then
         # Ask a couple of config questions & save a config file.
