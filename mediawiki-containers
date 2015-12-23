@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Simple shell script to start up MediaWiki + containers.
 # Alternative to docker-compose, with automatic docker subnet detection to make
 # this work on jessie or sid.
@@ -18,7 +20,6 @@ if [ -z "$MEDIAWIKI_DOMAIN" ]; then
 fi
 
 start () {
-    set -e
     echo
     echo "Starting DNS container.."
     docker pull tonistiigi/dnsdock
@@ -80,10 +81,10 @@ stop () {
     echo "Stopping and deleting all containers.."
     # The containers themselves are stateless (all data is stored in
     # /var/lib/mediawiki-containers), so always nuke them.
-    docker rm -f mediawiki 2>/dev/null
-    docker rm -f mediawiki-node-services 2>/dev/null
-    docker rm -f mysql 2>/dev/null
-    docker rm -f dnsdock 2>/dev/null
+    docker rm -f mediawiki 2>/dev/null || true
+    docker rm -f mediawiki-node-services 2>/dev/null || true
+    docker rm -f mysql 2>/dev/null || true
+    docker rm -f dnsdock 2>/dev/null || true
 }
 
 install_git() {
