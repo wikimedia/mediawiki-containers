@@ -27,7 +27,7 @@ curl https://raw.githubusercontent.com/wikimedia/mediawiki-containers/master/med
 ```
 
 Alternatively, you can check out this repository, and run `sudo
-./mediawiki-containers install` the checkout.
+./mediawiki-containers install` in the checkout.
 
 The installer mode will prompt you for
 - the domain to use, and
