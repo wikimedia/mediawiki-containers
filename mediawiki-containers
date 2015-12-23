@@ -74,7 +74,7 @@ start () {
 
     # Follow the mediawiki container logs
     #set -o pipefail
-    #docker logs -f mediawiki | sed '/^AH00558:/ q' || exit 1)
+    docker logs -f mediawiki
 }
 
 stop () {
@@ -136,8 +136,7 @@ install() {
     do_install
 
     echo
-    service mediawiki-containers stop
-    start
+    service mediawiki-containers restart
 
     echo
     echo "Your wiki should soon be available at http://$MEDIAWIKI_DOMAIN/."
@@ -146,20 +145,25 @@ install() {
     echo '  - `docker logs -f mediawiki` for MediaWiki,'
     echo '  - `docker logs -f mysql` for MySQL,'
     echo '  - `docker logs -f mediawiki-node-services` for services.'
-    echo 'For general OS errors, see `journalctl -f`.'
+    echo
+    echo 'Following startup via `journalctl -f`.'
+    journalctl -f | sed '/: AH00558: apache2: /q'
 }
 
 if [ "$1" == "stop" ]; then
     stop
+    exit 0
 elif [ "$1" == "start" ]; then
     start
 elif [ "$1" == "restart" ]; then
     stop
     start
+    exit 0
 elif [ -z "$1" -o "$1" == "install" ]; then
     echo "Welcome to MediaWiki-containers!"
     echo
     install
+    exit 0
 else
     echo "Invalid parameter $1"
     usage
