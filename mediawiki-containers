@@ -2,9 +2,10 @@
 
 set -e
 
-# Simple shell script to start up MediaWiki + containers.
-# Alternative to docker-compose, with automatic docker subnet detection to make
-# this work on jessie or sid.
+# Containerized MediaWiki install & startup.
+
+# Minimal installation on Debian 8.0 Jessie, Ubuntu 15.04+ or newer:
+# curl https://raw.githubusercontent.com/wikimedia/mediawiki-containers/master/mediawiki-containers | sudo bash
 
 BASEDIR=/srv/mediawiki-containers
 DATADIR="$BASEDIR/data"
@@ -113,15 +114,17 @@ usage() {
 }
 
 install() {
-    while true; do
-        read -p "Proceed to install / update mediawiki-containers? (y/n): " \
-            yn </dev/tty
-        case $yn in
-            [Yy]* ) break;;
-            [Nn]* ) echo "Okay, aborting."; exit 1;;
-            * ) echo "Please answer 'y' or 'n'.";;
-        esac
-    done
+    if [ "$1" != 'install' ]; then
+        while true; do
+            read -p "Proceed to install / update mediawiki-containers? (y/n): " \
+                yn </dev/tty
+            case $yn in
+                [Yy]* ) break;;
+                [Nn]* ) echo "Okay, aborting."; exit 1;;
+                * ) echo "Please answer 'y' or 'n'.";;
+            esac
+        done
+    fi
     # User answered 'y'; proceed to install.
 
     # Make sure we have git.
@@ -139,15 +142,26 @@ install() {
     service mediawiki-containers restart
 
     echo
-    echo "Your wiki should soon be available at http://$MEDIAWIKI_DOMAIN/."
+    echo 'Following startup via `journalctl -f -u mediawiki-containers`.'
     echo
-    echo 'To follow the startup progress, run'
+    journalctl -f -u mediawiki-containers | sed '/: Done in /q'
+    # Get the last line, too
+    lastline=$(journalctl -u mediawiki-containers | tail -1 | grep AH00558)
+    if [ -z "$lastline" ];then
+        echo "Apache startup apparently didn't finish properly."
+        echo "Output of journalctl -u mediawiki-containers:"
+        journalctl -u mediawiki-containers
+    else
+        echo $lastline
+        echo
+        echo "Congratulations! Your wiki should now be available at http://$MEDIAWIKI_DOMAIN/."
+    fi
+    echo
+    echo 'For detailed information / logs, try'
     echo '  - `docker logs -f mediawiki` for MediaWiki,'
     echo '  - `docker logs -f mysql` for MySQL,'
     echo '  - `docker logs -f mediawiki-node-services` for services.'
     echo
-    echo 'Following startup via `journalctl -f`.'
-    journalctl -f | sed '/: AH00558: apache2: /q'
 }
 
 if [ "$1" == "stop" ]; then
@@ -162,7 +176,7 @@ elif [ "$1" == "restart" ]; then
 elif [ -z "$1" -o "$1" == "install" ]; then
     echo "Welcome to MediaWiki-containers!"
     echo
-    install
+    install "$1"
     exit 0
 else
     echo "Invalid parameter $1"

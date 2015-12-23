@@ -1,7 +1,4 @@
 #!/bin/sh
 
 # Update the installation..
-/usr/local/src/mediawiki-containers/install.sh
-
-# And restart the containers..
-service mediawiki-containers restart
+/srv/mediawiki-containers/mediawiki-containers install
