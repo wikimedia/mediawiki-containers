@@ -72,7 +72,7 @@ start () {
         wikimedia/mediawiki-node-services
 
     # Follow the mediawiki container logs
-    docker logs -f mediawiki
+    docker logs -f mediawiki | sed '/^AH00558: / q'
 }
 
 stop () {
