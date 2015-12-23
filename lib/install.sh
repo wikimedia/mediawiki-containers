@@ -171,7 +171,6 @@ ask_config() {
 }
 
 install_systemd_init() {
-    pwd
     if hash systemd 2>/dev/null; then
         # Install systemd unit
         echo "Installing systemd unit file /etc/systemd/system/mediawiki-containers.."
