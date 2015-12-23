@@ -1,10 +1,6 @@
 #!/bin/bash
 
-# mediawiki-containers installer
-# 
-# Usage:
-# curl https://raw.githubusercontent.com/wikimedia/mediawiki-containers/master/install.sh \
-#   | sudo bash
+# mediawiki-containers installer utils
 #
 
 set -e

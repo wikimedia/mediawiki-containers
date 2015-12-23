@@ -1,3 +1,7 @@
+# WARNING: This is lacking several of the features of ./mediawiki-containers,
+# and is thus not currently the recommended installation method. It is not
+# currently maintained. Use at your own risk.
+#
 # Run MediaWiki, RESTBase & Parsoid using `docker-compose up`
 
 mediawiki:

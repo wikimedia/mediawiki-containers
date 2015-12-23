@@ -5,17 +5,40 @@ Mathoid & other services.
 
 ## Requirements 
 
-You need `docker` >= 1.6. On a recent Debian or Ubuntu distribution (Jessie,
-Sid), this can be installed with `apt-get install docker.io`. See [the Docker
-install instructions](https://docs.docker.com/engine/installation/) for other
-platforms.
+- KVM or similar VM with at least 512mb RAM. These can be had from a variety
+    of vendors for around $5/month. [This comparison from
+    ServerBear](http://serverbear.com/compare?Sort=BearScore&Order=desc&Server+Type=VPS&Monthly+Cost=-&HDD=-&RAM=500000000-&BearScore=-&Virtualization=KVM)
+    lists some popular options. Any [labs
+    instance](https://www.mediawiki.org/wiki/Wikimedia_Labs#Open_access) will
+    work as well.
+- Distribution: One of
+    - Debian 8.0 Jessie or newer, or
+    - Ubuntu 15.04 or newer, or
+    - arbitrary systemd-based distro with git and [docker >=
+        1.6](https://docs.docker.com/engine/installation/) installed.
+- Root shell.
+- Port 80 available (TODO: automatically switch to alternative ports).
 
-The minimum hardware requirements are a KVM or similar VM with 512M RAM. These
-can be had from a variety of vendors for around $5/month. [This
-comparison from ServerBear lists some
-options](http://serverbear.com/compare?Sort=BearScore&Order=desc&Server+Type=VPS&Monthly+Cost=-&HDD=-&RAM=500000000-&BearScore=-&Virtualization=KVM).
+## Installation
 
-## Description
+On Debian and Ubuntu, the fastest installation method is this one-liner:
+```bash
+curl https://raw.githubusercontent.com/wikimedia/mediawiki-containers/master/mediawiki-containers | sudo bash
+```
+
+Alternatively, you can check out this repository, and run `sudo
+./mediawiki-containers install` the checkout.
+
+The installer mode will prompt you for
+- the domain to use, and
+- whether to enable automatic nightly updates.
+
+It will set up a systemd unit, so that your MediaWiki install automatically
+starts on boot. [Here is a
+transcript](https://gist.github.com/gwicke/656d30a934e5f956747b) of an
+installer run.
+
+## Architecture
 
 Running `sudo ./mediawiki-containers start` in a checkout of this repository will
 start four containers:
@@ -41,7 +64,7 @@ http://localhost/.
 All data is stored outside the containers in a host directory:
 
 ```bash
-ls /var/lib/mediawiki-containers/
+ls /srv/mediawiki-containers/data
 mediawiki  mysql  node-services
 ```
 
@@ -50,8 +73,11 @@ startup, which means that updating to a newer version of the entire setup is as
 easy as a restart:
 
 ```bash
-sudo ./mediawiki-containers restart
+sudo service mediawiki-containers restart
 ```
+
+Building on this upgrade-by-default approach, the installer can optionally set
+up fully automatic nightly upgrades by setting up a one-line cron job.
 
 ## Status & next steps
 
@@ -76,16 +102,3 @@ Next steps:
 - Profit.
 
 Tell us about your ideas at https://phabricator.wikimedia.org/T92826. 
-
-### Alternative to the shell script: `docker-compose`
-
-This project also provides an equivalent `docker-compose` configuration, which
-can be used by executing `docker-compose up`. A nice thing about using
-docker-compose is a very slightly cleaner configuration, and merged output from
-all containers. 
-
-A downside is its lacking support for parametrizing the docker network IP. It
-turns out that docker on older distributions like Jessie uses a different
-network than newer distros, which makes it difficult to support DNS resolution
-in both using the same `docker-compose` config. The provided configuration
-assumes a recent distribution, so won't work on Jessie out of the box.
