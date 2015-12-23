@@ -4,9 +4,11 @@
 # Alternative to docker-compose, with automatic docker subnet detection to make
 # this work on jessie or sid.
 
-if [ -d /var/lib/mediawiki-containers \
-    -a -f /var/lib/mediawiki-containers/config ]; then
-    source /var/lib/mediawiki-containers/config
+BASEDIR=/srv/mediawiki-containers
+DATADIR="$BASEDIR/data"
+
+if [ -d $BASEDIR -a -f $BASEDIR/config ]; then
+    source $BASEDIR/config
 fi
 
 # Set up defaults
@@ -32,7 +34,7 @@ start () {
     docker run -d \
         --name=mysql \
         -e SERVICE_NAME=mysql \
-        -v /var/lib/mediawiki-containers/mediawiki-mysql:/var/lib/mysql:rw \
+        -v $DATADIR/mediawiki-mysql:/var/lib/mysql:rw \
         -e MYSQL_ROOT_PASSWORD=password \
         --dns "$DNS" \
         mariadb
@@ -43,7 +45,7 @@ start () {
     docker run -d \
         --name=mediawiki \
         -v `pwd`/conf/mediawiki:/conf:ro \
-        -v /var/lib/mediawiki-containers/mediawiki-core:/data:rw \
+        -v $DATADIR/mediawiki-core:/data:rw \
         -e MEDIAWIKI_SITE_SERVER="//$MEDIAWIKI_DOMAIN" \
         -e MEDIAWIKI_SITE_NAME=MediaWiki \
         -e MEDIAWIKI_SITE_LANG=en \
@@ -63,7 +65,7 @@ start () {
     docker pull wikimedia/mediawiki-node-services
     docker run -d \
         --name=mediawiki-node-services \
-        -v /var/lib/mediawiki-containers/node-services:/data \
+        -v $DATADIR/node-services:/data \
         -e MEDIAWIKI_API_URL=http://mediawiki.docker/api.php \
         --dns "$DNS" \
         -p 8142:8142 \
@@ -77,25 +79,84 @@ stop () {
     echo "Stopping and deleting all containers.."
     # The containers themselves are stateless (all data is stored in
     # /var/lib/mediawiki-containers), so always nuke them.
-    docker rm -f mediawiki
-    docker rm -f mediawiki-node-services
-    docker rm -f mysql
-    docker rm -f dnsdock
+    docker rm -f mediawiki 2>/dev/null
+    docker rm -f mediawiki-node-services 2>/dev/null
+    docker rm -f mysql 2>/dev/null
+    docker rm -f dnsdock 2>/dev/null
 }
 
+install_git() {
+    if ! hash git 2>/dev/null;then
+        echo "Installing git.."
+        apt-get install -y git
+    else
+        echo "[OK] Found git."
+    fi
+}
 
-if [ -z "$1" ];then
-    echo "Welcome to containerized MediaWiki."
-    echo "Usage: $0 [start|stop|restart]"
-    exit 1
-elif [ "$1" == "stop" ]; then
+check_out_mediawiki_containers() {
+    if [ ! -d "$BASEDIR" ];then
+        echo "Cloning mediawiki-containers to $BASEDIR.."
+        git clone https://github.com/wikimedia/mediawiki-containers.git "$BASEDIR"
+    else
+        cd "$BASEDIR"
+        echo "Updating $BASEDIR.."
+        git pull
+    fi
+    cd "$BASEDIR"
+}
+
+usage() {
+    echo "Usage: $0 [start|stop|restart|install]"
+}
+
+install() {
+    while true; do
+        read -p "Would you proceed to install / update mediawiki-containers? (y/n): " \
+            yn
+        case $yn in
+            [Yy]* ) break;;
+            [Nn]* ) echo "Okay, aborting."; exit 1;;
+            * ) echo "Please answer 'y' or 'n'.";;
+        esac
+    done
+    # User answered 'y'; proceed to install.
+
+    # Make sure we have git.
+    install_git
+
+    # Clone / update the mediawiki-containers repository.
+    check_out_mediawiki_containers
+
+    cd $BASEDIR
+    
+    source ./lib/install.sh
+    do_install
+
+    echo "Starting mediawiki-containers.."
+    stop
+    start
+
+    echo "Starting up containers.."
+    echo "Your wiki should shortly be available at http://$MEDIAWIKI_DOMAIN/."
+    echo 'To follow the startup progress, run `journalctl -f`.'
+    echo "[OK] All done."
+}
+
+if [ "$1" == "stop" ]; then
     stop
 elif [ "$1" == "start" ]; then
     start
 elif [ "$1" == "restart" ]; then
     stop
     start
+elif [ -z "$1" -o "$1" == "install" ]; then
+    echo "Welcome to MediaWiki-containers!"
+    echo
+    install
 else
-    echo "Invalid parameter: $1"
+    echo "Invalid parameter $1"
+    usage
     exit 1
 fi
+

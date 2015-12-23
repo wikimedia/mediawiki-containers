@@ -134,27 +134,6 @@ check_docker_version() {
     fi
 }
 
-install_git() {
-    if ! hash git 2>/dev/null;then
-        echo "Installing git.."
-        apt-get install -y git
-    else
-        echo "[OK] Found git."
-    fi
-}
-
-check_out_mediawiki_containers() {
-    srcdir=/usr/local/src/mediawiki-containers
-    if [ ! -d /usr/local/src/mediawiki-containers ];then
-        echo "Cloning mediawiki-containers to $srcdir.."
-        git clone https://github.com/wikimedia/mediawiki-containers.git "$srcdir"
-    else
-        cd "$srcdir"
-        echo "Updating mediawiki-containers in $srcdir.."
-        git pull
-    fi
-    cd "$srcdir"
-}
 
 install_docker() {
     if hash docker 2>/dev/null;then
@@ -170,25 +149,25 @@ install_docker() {
 }
 
 ask_config() {
-    mkdir -p /var/lib/mediawiki-containers
-    conf=/var/lib/mediawiki-containers/config
+    mkdir -p $DATADIR/data
+    conf=$DATADIR/config
     if [ ! -f $conf ];then
         # Ask a couple of config questions & save a config file.
         read -p "Please enter the domain your wiki will be reachable at: " \
-            domain </dev/tty 
+            MEDIAWIKI_DOMAIN </dev/tty 
         while true; do
             read -p "Should we enable automatic nightly code updates? [yn]: " \
-                autoupdate </dev/tty
-            case $autoupdate in
-                [Yy]* ) autoupdate=true; break;;
-                [Nn]* ) autoupdate=false; break;;
+                AUTO_UPDATE </dev/tty
+            case $AUTO_UPDATE in
+                [Yy]* ) AUTO_UPDATE=true; break;;
+                [Nn]* ) AUTO_UPDATE=false; break;;
                 * ) echo "Please answer yes or no.";;
             esac
         done
-        echo "MEDIAWIKI_DOMAIN=\"$domain\"" > $conf
-        echo "AUTO_UPDATE=$autoupdate" >> $conf
+        echo "MEDIAWIKI_DOMAIN=\"$MEDIAWIKI_DOMAIN\"" > "$conf"
+        echo "AUTO_UPDATE=$AUTO_UPDATE" >> "$conf"
     fi
-    source /var/lib/mediawiki-containers/config
+    source "$conf"
 }
 
 install_systemd_init() {
@@ -213,41 +192,20 @@ enable_automatic_updates() {
 
 
 # Main setup routine.
-install() {
-    if [ "$1" != '--continue' ];then
-        # Make sure we have git.
-        install_git
+do_install() {
+    # Make sure we have docker.
+    install_docker
 
-        # Clone / update the mediawiki-containers repository.
-        check_out_mediawiki_containers
+    # Ask some configuration question.
+    ask_config
 
-        # Switch to the latest installer.
-        /usr/local/src/mediawiki-containers/install.sh --continue
-        exit $?
-    else
-        # Make sure we have docker.
-        install_docker
+    # Install a systemd unit or init script.
+    install_systemd_init
 
-        # Ask some configuration question.
-        ask_config
-
-        # Install a systemd unit or init script.
-        install_systemd_init
-
-        # Set up a cron job for automatic updates.
-        if [ "$AUTO_UPDATE" = 'true' ];then
-            enable_automatic_updates
-        fi
-
-        # TODO: Prompt for the domain name & set up letsencrypt & wgServer
-
-        echo "Starting mediawiki-containers.."
-        service mediawiki-containers restart
-
-        echo "Starting up containers.."
-        echo "Your wiki should shortly be available at http://$MEDIAWIKI_DOMAIN/."
-        echo 'To follow the startup progress, run `journalctl -f`.'
-        echo "[OK] All done."
+    # Set up a cron job for automatic updates.
+    if [ "$AUTO_UPDATE" = 'true' ];then
+        enable_automatic_updates
     fi
+
+    # TODO: Prompt for the domain name & set up letsencrypt & wgServer
 }
-install "$@"
