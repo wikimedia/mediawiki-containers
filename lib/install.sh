@@ -135,11 +135,11 @@ install_docker() {
     if hash docker 2>/dev/null;then
         docker_version=$(docker --version | awk '{print $3}')
         check_docker_version
-        echo "[OK] Found docker $docker_version"
+        echoinfo "Found docker $docker_version"
     else
         docker_version=$(apt-cache show docker.io | grep Version | head -1 | awk '{print $2}') 
         check_docker_version
-        echo "Installing docker.io.."
+        echoinfo "Installing docker.io.."
         apt-get install -y docker.io
     fi
 }

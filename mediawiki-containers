@@ -126,7 +126,7 @@ install_git() {
         echoinfo "Installing git.."
         apt-get install -y git
     else
-        echoinfo "[OK] Git already installed."
+        echoinfo "Git already installed."
     fi
 }
 
