@@ -41,17 +41,17 @@ __detect_color_support
 
 # Echo info to stdout
 echoinfo() {
-    printf "${GC} *  INFO${EC}: %s\n" "$@";
+    printf "${GC}[INFO]${EC}: %s\n" "$@";
 }
 
 # Echo error to stderr
 echoerror() {
-    printf "${RC} * ERROR${EC}: %s\n" "$@" 1>&2;
+    printf "${RC}[ERROR]${EC}: %s\n" "$@" 1>&2;
 }
 
 # Echo warnings to stdout
 echowarn() {
-    printf "${YC} *  WARN${EC}: %s\n" "$@";
+    printf "${YC}[WARN]${EC}: %s\n" "$@";
 }
 
 start () {
