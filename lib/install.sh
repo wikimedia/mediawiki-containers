@@ -7,12 +7,12 @@ set -e
 
 # Output the instructions to report bug about this script
 report_bug() {
-  echo "Please file a Bug Report at https://github.com/wikimedia/mediawiki-containers/issues/new"
-  echo ""
-  echo "Please include as many details about the problem as possible i.e., how to reproduce"
-  echo "the problem (if possible), type of the Operating System and its version, etc.,"
-  echo "and any other relevant details that might help us with troubleshooting."
-  echo ""
+  echoerror "Please file a Bug Report at https://github.com/wikimedia/mediawiki-containers/issues/new"
+  echoerror ""
+  echoerror "Please include as many details about the problem as possible i.e., how to reproduce"
+  echoerror "the problem (if possible), type of the Operating System and its version, etc.,"
+  echoerror "and any other relevant details that might help us with troubleshooting."
+  echoerror ""
 }
 
 # Platform and Platform Version detection
@@ -149,15 +149,21 @@ ask_config() {
     conf=$DATADIR/config
     if [ ! -f $conf ];then
         # Ask a couple of config questions & save a config file.
-        read -p "Please enter the domain your wiki will be reachable at: " \
-            MEDIAWIKI_DOMAIN </dev/tty 
+        echoinfo "MediaWiki needs to know the domain your wiki will be using."
+        echoinfo "Examples: www.yourdomain.com, localhost"
+        read -p "Domain [localhost]: " MEDIAWIKI_DOMAIN </dev/tty 
+        if [ -z "$MEDIAWIKI_DOMAIN" ];then
+            MEDIAWIKI_DOMAIN='localhost'
+        fi
+        echoinfo "We can set up automatic nightly code updates for you."
+        echoinfo "Enabling this keeps your installation secure and up to date."
         while true; do
-            read -p "Should we enable automatic nightly code updates? [yn]: " \
+            read -p "Should we enable automatic nightly code updates? (y/n): " \
                 AUTO_UPDATE </dev/tty
             case $AUTO_UPDATE in
                 [Yy]* ) AUTO_UPDATE=true; break;;
                 [Nn]* ) AUTO_UPDATE=false; break;;
-                * ) echo "Please answer yes or no.";;
+                * ) echowarn "Please answer yes or no.";;
             esac
         done
         echo "MEDIAWIKI_DOMAIN=\"$MEDIAWIKI_DOMAIN\"" > "$conf"
@@ -169,11 +175,11 @@ ask_config() {
 install_systemd_init() {
     if hash systemd 2>/dev/null; then
         # Install systemd unit
-        echo "Installing systemd unit file /etc/systemd/system/mediawiki-containers.."
+        echoinfo "Installing systemd unit file /etc/systemd/system/mediawiki-containers.."
         ln -sf "`pwd`/init/mediawiki-containers.service" /etc/systemd/system
         systemctl daemon-reload
     else
-        echo "FIXME: Support init scripts on distributions without systemd!"
+        echoerror "FIXME: Support init scripts on distributions without systemd!"
         report_bug
         exit 1
         # echo "Installing init script /etc/init.d/mediawiki-containers.."

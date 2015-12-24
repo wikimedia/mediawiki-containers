@@ -20,17 +20,49 @@ if [ -z "$MEDIAWIKI_DOMAIN" ]; then
     MEDIAWIKI_DOMAIN="localhost"
 fi
 
+# Some utilities
+_COLORS=${BS_COLORS:-$(tput colors 2>/dev/null || echo 0)}
+__detect_color_support() {
+    if [ $? -eq 0 ] && [ "$_COLORS" -gt 2 ]; then
+        RC="\033[1;31m"
+        GC="\033[1;32m"
+        BC="\033[1;34m"
+        YC="\033[1;33m"
+        EC="\033[0m"
+    else
+        RC=""
+        GC=""
+        BC=""
+        YC=""
+        EC=""
+    fi
+}
+__detect_color_support
+
+# Echo info to stdout
+echoinfo() {
+    printf "${GC} *  INFO${EC}: %s\n" "$@";
+}
+
+# Echo error to stderr
+echoerror() {
+    printf "${RC} * ERROR${EC}: %s\n" "$@" 1>&2;
+}
+
+# Echo warnings to stdout
+echowarn() {
+    printf "${YC} *  WARN${EC}: %s\n" "$@";
+}
+
 start () {
-    echo
-    echo "Starting DNS container.."
+    echoinfo "Starting DNS container.."
     docker run -d \
         --name=dnsdock \
         -v /var/run/docker.sock:/run/docker.sock \
         tonistiigi/dnsdock
     DNS=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' dnsdock)
 
-    echo
-    echo "Starting mysql(mariadb) container.."
+    echoinfo "Starting mysql(mariadb) container.."
     docker run -d \
         --name=mysql \
         -e SERVICE_NAME=mysql \
@@ -39,8 +71,7 @@ start () {
         --dns "$DNS" \
         mariadb
 
-    echo
-    echo "Starting mediawiki container.."
+    echoinfo "Starting mediawiki container.."
     docker run -d \
         --name=mediawiki \
         -v `pwd`/conf/mediawiki:/conf:ro \
@@ -59,8 +90,7 @@ start () {
         -p 80:80 \
         wikimedia/mediawiki
 
-    echo
-    echo "Starting mediawiki-node-services container.."
+    echoinfo "Starting mediawiki-node-services container.."
     docker run -d \
         --name=mediawiki-node-services \
         -v $DATADIR/node-services:/data \
@@ -82,7 +112,7 @@ docker_pull() {
 }
 
 stop () {
-    echo "Stopping and deleting all containers.."
+    echoinfo "Stopping and deleting all containers.."
     # The containers themselves are stateless (all data is stored in
     # /srv/mediawiki-containers/data), so always nuke them.
     docker rm -f mediawiki 2>/dev/null || true
@@ -93,30 +123,34 @@ stop () {
 
 install_git() {
     if ! hash git 2>/dev/null;then
-        echo "Installing git.."
+        echoinfo "Installing git.."
         apt-get install -y git
     else
-        echo "[OK] Found git."
+        echoinfo "[OK] Git already installed."
     fi
 }
 
 check_out_mediawiki_containers() {
     if [ ! -d "$BASEDIR" ];then
-        echo "Cloning mediawiki-containers to $BASEDIR.."
+        echoinfo "Cloning mediawiki-containers to $BASEDIR.."
         git clone https://github.com/wikimedia/mediawiki-containers.git "$BASEDIR"
     else
         cd "$BASEDIR"
-        echo "Updating $BASEDIR.."
+        echoinfo "Updating $BASEDIR.."
         git pull
     fi
     cd "$BASEDIR"
 }
 
 usage() {
-    echo "Usage: $0 [start|stop|restart|install]"
+    echowarn "Usage: $0 [start|stop|restart|install]"
 }
 
 install() {
+    echoinfo "The installer will:"
+    echoinfo " - Check docker and git dependencies, and install them if necessary."
+    echoinfo " - Configure and start MediaWiki containers."
+    echoinfo " - Set up a systemd unit, so that MediaWiki containers are started on boot."
     if [ "$1" != 'install' ]; then
         while true; do
             read -p "Proceed to install / update mediawiki-containers? (y/n): " \
@@ -144,29 +178,26 @@ install() {
     # Update docker images
     docker_pull
 
-    echo
     service mediawiki-containers restart
 
-    echo
-    echo 'Following startup via `journalctl -f -u mediawiki-containers`.'
-    echo
+    echoinfo 'Following startup via `journalctl -f -u mediawiki-containers`.'
     journalctl -f -u mediawiki-containers -n 0 | sed '/: Done in /q'
     # Get the last line, too
     lastline=$(journalctl -u mediawiki-containers | tail -1 | grep AH00558)
     if [ -z "$lastline" ];then
-        echo "Apache startup apparently didn't finish properly."
-        echo "Output of journalctl -u mediawiki-containers:"
+        echoerror "Apache startup apparently didn't finish properly."
+        echoerror "Output of journalctl -u mediawiki-containers:"
         journalctl -u mediawiki-containers
     else
         echo $lastline
         echo
-        echo "Congratulations! Your wiki should now be available at http://$MEDIAWIKI_DOMAIN/."
+        echoinfo "Congratulations! Your wiki should now be available at http://$MEDIAWIKI_DOMAIN/."
     fi
     echo
-    echo 'For detailed information / logs, try'
-    echo '  - `docker logs -f mediawiki` for MediaWiki,'
-    echo '  - `docker logs -f mysql` for MySQL,'
-    echo '  - `docker logs -f mediawiki-node-services` for services.'
+    echoinfo 'For detailed information / logs, try'
+    echoinfo '  - `docker logs -f mediawiki` for MediaWiki,'
+    echoinfo '  - `docker logs -f mysql` for MySQL,'
+    echoinfo '  - `docker logs -f mediawiki-node-services` for services.'
     echo
 }
 
@@ -180,7 +211,7 @@ elif [ "$1" == "restart" ]; then
     start
     exit 0
 elif [ -z "$1" -o "$1" == "install" ]; then
-    echo "Welcome to MediaWiki-containers!"
+    echoinfo "Welcome to MediaWiki-containers!"
     echo
     install "$1"
     exit 0
