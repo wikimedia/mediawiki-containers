@@ -10,8 +10,8 @@ set -e
 BASEDIR=/srv/mediawiki-containers
 DATADIR="$BASEDIR/data"
 
-if [ -d $BASEDIR -a -f $BASEDIR/config ]; then
-    source $BASEDIR/config
+if [ -d $DATADIR -a -f $DATADIR/config ]; then
+    source $DATADIR/config
 fi
 
 # Set up defaults
