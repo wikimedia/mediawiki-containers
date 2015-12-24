@@ -20,6 +20,11 @@ if [ -z "$MEDIAWIKI_DOMAIN" ]; then
     MEDIAWIKI_DOMAIN="localhost"
 fi
 
+# Generate MEDIAWIKI_ADMIN_PASS
+if [ -z "$MEDIAWIKI_ADMIN_PASS" ];then
+    MEDIAWIKI_ADMIN_PASS=$(</dev/urandom tr -dc A-Za-z0-9 | head -c8)
+fi
+
 # Some utilities
 _COLORS=${BS_COLORS:-$(tput colors 2>/dev/null || echo 0)}
 __detect_color_support() {
@@ -80,7 +85,7 @@ start () {
         -e MEDIAWIKI_SITE_NAME=MediaWiki \
         -e MEDIAWIKI_SITE_LANG=en \
         -e MEDIAWIKI_ADMIN_USER=admin \
-        -e MEDIAWIKI_ADMIN_PASS=rosebud \
+        -e MEDIAWIKI_ADMIN_PASS=$MEDIAWIKI_ADMIN_PASS \
         -e MEDIAWIKI_UPDATE=true \
         -e MEDIAWIKI_DB_USER=root \
         -e MEDIAWIKI_DB_HOST=mysql.docker \
@@ -192,6 +197,7 @@ install() {
         echo $lastline
         echo
         echoinfo "Congratulations! Your wiki should now be available at http://$MEDIAWIKI_DOMAIN/."
+        echoinfo "The password for the 'admin' user is '$MEDIAWIKI_ADMIN_PASS'".
     fi
     echo
     echoinfo 'For detailed information / logs, try'
