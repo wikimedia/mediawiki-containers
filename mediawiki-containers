@@ -23,7 +23,6 @@ fi
 start () {
     echo
     echo "Starting DNS container.."
-    docker pull tonistiigi/dnsdock
     docker run -d \
         --name=dnsdock \
         -v /var/run/docker.sock:/run/docker.sock \
@@ -32,7 +31,6 @@ start () {
 
     echo
     echo "Starting mysql(mariadb) container.."
-    docker pull mariadb
     docker run -d \
         --name=mysql \
         -e SERVICE_NAME=mysql \
@@ -43,7 +41,6 @@ start () {
 
     echo
     echo "Starting mediawiki container.."
-    docker pull wikimedia/mediawiki
     docker run -d \
         --name=mediawiki \
         -v `pwd`/conf/mediawiki:/conf:ro \
@@ -64,7 +61,6 @@ start () {
 
     echo
     echo "Starting mediawiki-node-services container.."
-    docker pull wikimedia/mediawiki-node-services
     docker run -d \
         --name=mediawiki-node-services \
         -v $DATADIR/node-services:/data \
@@ -78,10 +74,17 @@ start () {
     docker logs -f mediawiki
 }
 
+docker_pull() {
+    docker pull tonistiigi/dnsdock
+    docker pull mariadb
+    docker pull wikimedia/mediawiki
+    docker pull wikimedia/mediawiki-node-services
+}
+
 stop () {
     echo "Stopping and deleting all containers.."
     # The containers themselves are stateless (all data is stored in
-    # /var/lib/mediawiki-containers), so always nuke them.
+    # /srv/mediawiki-containers/data), so always nuke them.
     docker rm -f mediawiki 2>/dev/null || true
     docker rm -f mediawiki-node-services 2>/dev/null || true
     docker rm -f mysql 2>/dev/null || true
@@ -137,6 +140,9 @@ install() {
     
     source ./lib/install.sh
     do_install
+
+    # Update docker images
+    docker_pull
 
     echo
     service mediawiki-containers restart
