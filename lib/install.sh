@@ -170,7 +170,7 @@ ask_config() {
         done
         echo "MEDIAWIKI_DOMAIN=\"$MEDIAWIKI_DOMAIN\"" > "$conf"
         echo "AUTO_UPDATE=$AUTO_UPDATE" >> "$conf"
-        echo "MEDIAWIKI_ADMIN_PASS=$MEDIAWIKI_ADMIN_PASS" >> "$conf"
+        echo "MEDIAWIKI_ADMIN_PASS='$MEDIAWIKI_ADMIN_PASS'" >> "$conf"
     fi
     source "$conf"
 }
