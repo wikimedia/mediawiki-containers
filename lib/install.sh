@@ -137,10 +137,15 @@ install_docker() {
         check_docker_version
         echo "[OK] Found docker $docker_version"
     else
-        docker_version=$(apt-cache show docker.io | grep Version | head -1 | awk '{print $2}') 
+        docker_pkg=docker.io
+        if apt-cache show lxc-docker 2>&1 1>/dev/null; then
+            # the user has the upstream-maintained apt repo, use that
+            docker_pkg=lxc-docker
+        fi
+        docker_version=$(apt-cache show $docker_pkg | grep Version | head -1 | awk '{print $2}')
         check_docker_version
         echo "Installing docker.io.."
-        apt-get install -y docker.io
+        apt-get install -y $docker_pkg
     fi
 }
 
