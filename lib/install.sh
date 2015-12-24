@@ -148,6 +148,7 @@ ask_config() {
     mkdir -p $DATADIR
     conf=$DATADIR/config
     if [ ! -f $conf ];then
+        echo
         # Ask a couple of config questions & save a config file.
         echoinfo "MediaWiki needs to know the domain your wiki will be using."
         echoinfo "Examples: www.yourdomain.com, localhost"
@@ -155,6 +156,7 @@ ask_config() {
         if [ -z "$MEDIAWIKI_DOMAIN" ];then
             MEDIAWIKI_DOMAIN='localhost'
         fi
+        echo
         echoinfo "We can set up automatic nightly code updates for you."
         echoinfo "Enabling this keeps your installation secure and up to date."
         while true; do
