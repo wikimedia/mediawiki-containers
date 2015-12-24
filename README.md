@@ -35,8 +35,8 @@ The installer mode will prompt you for
 
 It will set up a systemd unit, so that your MediaWiki install automatically
 starts on boot. [Here is a
-transcript](https://gist.github.com/gwicke/656d30a934e5f956747b) of an
-installer run.
+screencast](https://people.wikimedia.org/~gwicke/mediawiki-containers-install.ogv)
+of an installer run.
 
 ## Architecture
 
