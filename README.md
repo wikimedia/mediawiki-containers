@@ -89,16 +89,22 @@ Done:
 
 - Hook up VisualEditor out of the box.
 - Update to MediaWiki ~~1.26~~ 1.27-wmf9.
-
-
-Next steps:
-
-- Forward `/api/rest_v1/` to RESTBase & configure RESTBase updates. Enable
-    Wikitext / HTML switching in VE.
 - Set up systemd / init scripts to start up the docker-compose setup on boot.
   - Possibly, also provide a systemd-only startup script that doesn't require docker-compose.
-- Add more extensions?
-- Use HHVM?
-- Profit.
+
+
+Next steps / wishlist:
+
+- Forward `/api/rest_v1/` to RESTBase & configure RESTBase updates. Enable Wikitext / HTML switching in VE.
+- Improve security:
+    - Run each container under a different, unprivileged user.
+    - Secure the install / update process with signatures.
+- Add popular extensions, and streamline the support for custom extensions.
+- Add services like mathoid, graphoid.
+- Use the HHVM PHP runtime instead of Zend, possibly using ideas from https://github.com/kasperisager/php-dockerized.
+- Support developer use cases:
+    - Optionally mount code volumes from the host system.
+    - Improve configuration customization support.
+- Support for more distributions.
 
 Tell us about your ideas at https://phabricator.wikimedia.org/T92826. 
