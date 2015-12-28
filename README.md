@@ -91,11 +91,12 @@ Done:
 - Update to MediaWiki ~~1.26~~ 1.27-wmf9.
 - Set up systemd / init scripts to start up the docker-compose setup on boot.
   - Possibly, also provide a systemd-only startup script that doesn't require docker-compose.
+- Forward `/api/rest_v1/` to RESTBase.
 
 
 Next steps / wishlist:
 
-- Forward `/api/rest_v1/` to RESTBase & configure RESTBase updates. Enable Wikitext / HTML switching in VE.
+- Configure RESTBase updates. Enable Wikitext / HTML switching in VE.
 - Improve security:
     - Run each container under a different, unprivileged user.
     - Secure the install / update process with signatures.
