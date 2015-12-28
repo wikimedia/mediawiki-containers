@@ -101,7 +101,6 @@ start () {
         -v $DATADIR/node-services:/data \
         -e MEDIAWIKI_API_URL=http://mediawiki.docker/api.php \
         --dns "$DNS" \
-        -p 8142:8142 \
         wikimedia/mediawiki-node-services
 
     # Follow the mediawiki container logs
