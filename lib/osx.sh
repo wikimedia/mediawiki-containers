@@ -21,7 +21,7 @@ prepare_docker_machine() {
   fi
   eval "$(docker-machine env ${MACHINE_NAME})"
   docker-machine ssh ${MACHINE_NAME} "sudo mkdir -p ${BASEDIR}"
-  docker-machine ssh ${MACHINE_NAME} "sudo mount -t vboxsf -o uid=999,gid=50 Basedir ${BASEDIR}"
+  docker-machine ssh ${MACHINE_NAME} "sudo mount -t vboxsf -o uid=999 Basedir ${BASEDIR}"
 }
 
 get_machine_address() {
