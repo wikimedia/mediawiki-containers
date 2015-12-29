@@ -15,17 +15,13 @@ prepare_docker_machine() {
     VBoxManage sharedfolder add ${MACHINE_NAME} --name Basedir --hostpath ${BASEDIR} --automount
     docker-machine start ${MACHINE_NAME}
     docker-machine regenerate-certs -f ${MACHINE_NAME}
-    eval "$(docker-machine env ${MACHINE_NAME})"
-    docker-machine ssh ${MACHINE_NAME} "sudo mkdir -p ${BASEDIR}"
-    docker-machine ssh ${MACHINE_NAME} "sudo mount -t vboxsf -o uid=999,gid=50 Basedir ${BASEDIR}"
-  else
-    machine_status=`docker-machine status mediawiki`
-    if [ "$machine_status" == "Stopped" ]; then
-      echo "Mediawiki machine is stopped. Starting."
+  elif [ `docker-machine status ${MACHINE_NAME}` == "Stopped" ]; then
+      echo "${MACHINE_NAME} machine is stopped. Starting."
       docker-machine start ${MACHINE_NAME}
-    fi
-    eval "$(docker-machine env ${MACHINE_NAME})"
   fi
+  eval "$(docker-machine env ${MACHINE_NAME})"
+  docker-machine ssh ${MACHINE_NAME} "sudo mkdir -p ${BASEDIR}"
+  docker-machine ssh ${MACHINE_NAME} "sudo mount -t vboxsf -o uid=999,gid=50 Basedir ${BASEDIR}"
 }
 
 get_machine_address() {

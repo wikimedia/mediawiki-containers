@@ -165,7 +165,11 @@ usage() {
 
 install() {
     if [ "$platform" != "debian" -a "$platform" != "ubuntu" ]; then
-	    echo "Only Debian and Ubuntu are currently supported!"
+        if [ "$platform" == "mac_os_x" ]; then
+            echo "Install is not supported on OS X, but you could use start/stop"
+        else
+	        echo "Only Debian and Ubuntu are currently supported!"
+	    fi
 	    exit 1;
     fi
     echoinfo "The installer will:"
