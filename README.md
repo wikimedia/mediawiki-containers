@@ -38,18 +38,6 @@ starts on boot. [Here is a
 screencast](https://people.wikimedia.org/~gwicke/mediawiki-containers-install.ogv)
 of an installer run.
 
-### Mac OS X
-Mac OS X has limited support: `install` command is not supported, but it's possible to manually
-start/stop containers using `sudo ./mediawiki-containers start`. 
-Additional requirements:
-- [Docker Toolbox](https://www.docker.com/docker-toolbox)
-
-On startup the installer will create an appropriate docker-machine, called `mediawiki` by default,
-and set up mapping between OS X host base directory and one inside the docker-machine VM.
-
-Please note, that the installation will not be available on localhost, but on the docker-machine
-host. It's ip address could be determined by running `sudo docker-machine ip mediawiki`.
-
 ## Architecture
 
 Running `sudo ./mediawiki-containers start` in a checkout of this repository will
