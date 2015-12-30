@@ -1,7 +1,10 @@
 # A lie, but that shouldn't matter.
 language: c
 
-sudo: true
+services:
+  - docker
+
+sudo: required
 
 # We override what to do anyway.
 script: sudo ./test.sh
