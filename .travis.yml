@@ -8,3 +8,10 @@ sudo: required
 
 # We override what to do anyway.
 script: sudo ./test.sh
+
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#wikimedia-services"
+    on_success: change
+    on_failure: always
