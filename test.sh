@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Basic installer tests
+# Basic mediawiki-containers install tests.
 
 set -e
 
