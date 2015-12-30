@@ -14,12 +14,6 @@ if [ -d $DATADIR -a -f $DATADIR/config ]; then
     source $DATADIR/config
 fi
 
-# Set up defaults
-if [ -z "$MEDIAWIKI_DOMAIN" ]; then
-    # Ewww..
-    MEDIAWIKI_DOMAIN="localhost"
-fi
-
 # Generate MEDIAWIKI_ADMIN_PASS
 if [ -z "$MEDIAWIKI_ADMIN_PASS" ];then
     MEDIAWIKI_ADMIN_PASS=$(</dev/urandom tr -dc A-Za-z0-9 | head -c8)
@@ -75,6 +69,11 @@ start () {
         -e MYSQL_ROOT_PASSWORD=password \
         --dns "$DNS" \
         mariadb
+
+    # Set up a default domain for start..
+    if [ -z "$MEDIAWIKI_DOMAIN" ]; then
+        MEDIAWIKI_DOMAIN="localhost"
+    fi
 
     echoinfo "Starting mediawiki container.."
     docker run -d \
