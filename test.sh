@@ -18,6 +18,17 @@ CHECKOUT=$(pwd)
 
 cd /tmp
 
+if [ -d /srv/mediawiki-containers ];then
+    echo "Found existing /srv/mediawiki-containers checkout."
+    read -p "Delete it? (y/[n]): " DELETE_IT
+    if [ "$DELETE_IT" == 'y' ];then
+        rm -rf /srv/mediawiki-containers
+    fi
+fi
+    
+git clone "$CHECKOUT" /srv/mediawiki-containers
+
+
 cat "$CHECKOUT/mediawiki-containers" | bash -s install
 
 check_service
