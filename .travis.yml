@@ -7,7 +7,9 @@ services:
 sudo: required
 
 # We override what to do anyway.
-script: sudo ./test.sh
+# Sadly, Travis does not have an image with systemd yet, so we can't test a
+# full install.
+script: sudo ./test.sh noinstall
 
 notifications:
   irc:

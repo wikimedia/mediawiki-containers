@@ -50,37 +50,48 @@ export AUTO_UPDATE=true
 
 CHECKOUT=$(pwd)
 
-cd /tmp
+test_install() {
+    cd /tmp
 
-if [ -d /srv/mediawiki-containers ];then
-    echowarn "Found existing /srv/mediawiki-containers checkout."
-    read -p "Delete it? (y/[n]): " DELETE_IT
-    if [ "$DELETE_IT" == 'y' ];then
-        rm -rf /srv/mediawiki-containers
-    else
-        echoerror "Aborted test as /srv/mediawiki-containers exists."
-        exit 1
+    if [ -d /srv/mediawiki-containers ];then
+        echowarn "Found existing /srv/mediawiki-containers checkout."
+        read -p "Delete it? (y/[n]): " DELETE_IT
+        if [ "$DELETE_IT" == 'y' ];then
+            rm -rf /srv/mediawiki-containers
+        else
+            echoerror "Aborted test as /srv/mediawiki-containers exists."
+            exit 1
+        fi
     fi
+        
+    # Trick the installer into testing the new code, rather than master.
+    git clone "$CHECKOUT" /srv/mediawiki-containers
+
+    cat "$CHECKOUT/mediawiki-containers" | bash -s install
+
+    check_service
+
+    echoinfo "Restart the service"
+    service mediawiki-containers restart
+
+    sleep 10
+
+    check_service
+
+    echoinfo "Exercise the automatic updater"
+    /etc/cron.daily/mediawiki-containers
+
+    check_service
+}
+
+if [ "$1" == 'noinstall' ];then
+    echoinfo "noinstall option set, only testing 'mediawiki-containers start'".
+    ./mediawiki-containers restart &
+    sleep 120
+    check_service
+else
+    test_install
 fi
-    
-# Trick the installer into testing the new code, rather than master.
-git clone "$CHECKOUT" /srv/mediawiki-containers
-
-cat "$CHECKOUT/mediawiki-containers" | bash -s install
-
-check_service
-
-echoinfo "Restart the service"
-service mediawiki-containers restart
-
-sleep 10
-
-check_service
-
-echoinfo "Exercise the automatic updater"
-/etc/cron.daily/mediawiki-containers
-
-check_service
 
 echoinfo "Congratulations, all is looking good!"
 exit 0
