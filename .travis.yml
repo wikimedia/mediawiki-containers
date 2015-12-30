@@ -1,0 +1,7 @@
+# A lie, but that shouldn't matter.
+language: c
+
+sudo: true
+
+# We override what to do anyway.
+script: sudo ./test.sh
