@@ -7,6 +7,9 @@ set -e
 # Minimal installation on Debian 8.0 Jessie, Ubuntu 15.04+ or newer:
 # curl https://raw.githubusercontent.com/wikimedia/mediawiki-containers/master/mediawiki-containers | sudo bash
 
+source ./lib/utils.sh
+get_platform
+
 BASEDIR=/srv/mediawiki-containers
 DATADIR="$BASEDIR/data"
 
@@ -14,10 +17,20 @@ if [ -d $DATADIR -a -f $DATADIR/config ]; then
     source $DATADIR/config
 fi
 
+if [ "$platform" == "mac_os_x" ]; then
+  source ./lib/osx.sh
+  prepare_docker_machine
+  get_machine_address
+fi
+
 # Set up defaults
 if [ -z "$MEDIAWIKI_DOMAIN" ]; then
     # Ewww..
-    MEDIAWIKI_DOMAIN="localhost"
+    if [ -z "$MACHINE_ADDRESS" ]; then
+        MEDIAWIKI_DOMAIN="localhost"
+    else
+        MEDIAWIKI_DOMAIN="$MACHINE_ADDRESS"
+    fi
 fi
 
 # Generate MEDIAWIKI_ADMIN_PASS
@@ -151,6 +164,14 @@ usage() {
 }
 
 install() {
+    if [ "$platform" != "debian" -a "$platform" != "ubuntu" ]; then
+        if [ "$platform" == "mac_os_x" ]; then
+            echo "Install is not supported on OS X, but you could use start/stop"
+        else
+	        echo "Only Debian and Ubuntu are currently supported!"
+	    fi
+	    exit 1;
+    fi
     echoinfo "The installer will:"
     echoinfo " - Check docker and git dependencies, and install them if necessary."
     echoinfo " - Configure and start MediaWiki containers."
@@ -175,7 +196,6 @@ install() {
     check_out_mediawiki_containers
 
     cd $BASEDIR
-    
     source ./lib/install.sh
     do_install
 
