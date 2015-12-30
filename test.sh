@@ -86,8 +86,10 @@ test_install() {
 
 if [ "$1" == 'noinstall' ];then
     echoinfo "noinstall option set, only testing 'mediawiki-containers start'".
+    # Sadly, `docker logs` ignores sigpipe, so we can't wait for startup to be
+    # done via | sed '/Done in /q'. Instead, employ a static sleep for now.
     ./mediawiki-containers restart &
-    sleep 120
+    sleep 180
     check_service
 else
     test_install
