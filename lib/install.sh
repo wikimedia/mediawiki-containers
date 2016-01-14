@@ -148,26 +148,30 @@ ask_config() {
     mkdir -p $DATADIR
     conf=$DATADIR/config
     if [ ! -f $conf ];then
-        echo
-        # Ask a couple of config questions & save a config file.
-        echoinfo "MediaWiki needs to know the domain your wiki will be using."
-        echoinfo "Examples: www.yourdomain.com, localhost"
-        read -p "Domain [localhost]: " MEDIAWIKI_DOMAIN </dev/tty 
         if [ -z "$MEDIAWIKI_DOMAIN" ];then
-            MEDIAWIKI_DOMAIN='localhost'
+            echo
+            # Ask a couple of config questions & save a config file.
+            echoinfo "MediaWiki needs to know the domain your wiki will be using."
+            echoinfo "Examples: www.yourdomain.com, localhost"
+            read -p "Domain [localhost]: " MEDIAWIKI_DOMAIN </dev/tty 
+            if [ -z "$MEDIAWIKI_DOMAIN" ];then
+                MEDIAWIKI_DOMAIN='localhost'
+            fi
         fi
-        echo
-        echoinfo "We can set up automatic nightly code updates for you."
-        echoinfo "Enabling this keeps your installation secure and up to date."
-        while true; do
-            read -p "Should we enable automatic nightly code updates? (y/n): " \
-                AUTO_UPDATE </dev/tty
-            case $AUTO_UPDATE in
-                [Yy]* ) AUTO_UPDATE=true; break;;
-                [Nn]* ) AUTO_UPDATE=false; break;;
-                * ) echowarn "Please answer yes or no.";;
-            esac
-        done
+        if [ -z "$AUTO_UPDATE" ]; then
+            echo
+            echoinfo "We can set up automatic nightly code updates for you."
+            echoinfo "Enabling this keeps your installation secure and up to date."
+            while true; do
+                read -p "Should we enable automatic nightly code updates? (y/n): " \
+                    AUTO_UPDATE </dev/tty
+                case $AUTO_UPDATE in
+                    [Yy]* ) AUTO_UPDATE=true; break;;
+                    [Nn]* ) AUTO_UPDATE=false; break;;
+                    * ) echowarn "Please answer yes or no.";;
+                esac
+            done
+        fi
         echo "MEDIAWIKI_DOMAIN=\"$MEDIAWIKI_DOMAIN\"" > "$conf"
         echo "AUTO_UPDATE=$AUTO_UPDATE" >> "$conf"
         echo "MEDIAWIKI_ADMIN_PASS='$MEDIAWIKI_ADMIN_PASS'" >> "$conf"

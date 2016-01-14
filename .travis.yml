@@ -1,0 +1,19 @@
+# A lie, but that shouldn't matter.
+language: c
+
+services:
+  - docker
+
+sudo: required
+
+# We override what to do anyway.
+# Sadly, Travis does not have an image with systemd yet, so we can't test a
+# full install.
+script: sudo ./test.sh noinstall
+
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#wikimedia-services"
+    on_success: change
+    on_failure: always
