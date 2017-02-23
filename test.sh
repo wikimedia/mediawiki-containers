@@ -38,9 +38,9 @@ echowarn() {
 }
 
 check_service() {
-    echoinfo "curl http://localhost/api/rest_v1/page/html/Main_Page"
+    echoinfo "curl http://localhost/index.php/Main_Page"
     # Make sure that the wiki is reachable & RESTBase works
-    curl http://localhost/api/rest_v1/page/html/Main_Page \
+    curl http://localhost/index.php/Main_Page \
         | grep -q "MediaWiki has been successfully installed"
 }
 
