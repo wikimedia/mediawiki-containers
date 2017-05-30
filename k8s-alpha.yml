@@ -1,0 +1,20 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mathoid
+  labels:
+    service_type: nodejs
+    service_name: mathoid
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service_name: mathoid
+    spec:
+      containers:
+        - name: mathoid
+          image: mathoid:k1
+          ports:
+            - containerPort: 10044
+              protocol: TCP
