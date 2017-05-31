@@ -11,6 +11,10 @@ git clone git@github.com:wikimedia/mediawiki-containers.git
 cd mediawiki-containers
 git checkout k8s
 
+# Temporary work-around: Modify the absolute path to your mediawiki-containers
+# checkout at the end of k8s-alpha.yml to reflect your checkout
+vim k8s-alpha.yml
+
 # start cluster
 kubectl create -f k8s-alpha.yml
 # expose as service
