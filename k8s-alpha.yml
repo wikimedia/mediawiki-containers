@@ -34,7 +34,7 @@ spec:
             - name: MEDIAWIKI_DB_HOST
               value: 127.0.0.1
             - name: MEDIAWIKI_RESTBASE_URL
-              value: http://localhost:7231/localhost/v1
+              value: http://localhost:7231/api/rest_v1
           volumeMounts:
             - name: mediawiki-storage
               mountPath: /data
@@ -46,9 +46,6 @@ spec:
           env:
             - name: MEDIAWIKI_API_URL
               value: http://localhost/api.php
-          ports:
-            - containerPort: 7231
-              protocol: TCP
           volumeMounts:
             - name: node-services-storage
               mountPath: /data
@@ -58,9 +55,6 @@ spec:
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: password
-          ports:
-            - name: mysql
-              containerPort: 3306
           volumeMounts:
             - name: mysql-storage
               mountPath: /var/lib/mysql
