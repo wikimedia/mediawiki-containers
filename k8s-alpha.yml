@@ -42,7 +42,7 @@ spec:
               mountPath: /conf
 
         - name: mediawiki-node-services
-          image: wikimedia/mediawiki-node-services
+          image: wikimedia/mediawiki-node-services:0.2.1
           env:
             - name: MEDIAWIKI_API_URL
               value: http://localhost/api.php
