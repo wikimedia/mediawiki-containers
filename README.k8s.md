@@ -23,6 +23,12 @@ kubectl get service
 
 ## Optional: Native docker / kubernetes on Debian sid
 
+This [brand new
+feature](https://github.com/kubernetes/minikube/commit/ccb0fb3bd2dddbb172e00197d7ba5e7d3aaf9e0f)
+(as of May 31st, 2017) in minikube skips virtualization, and instead directly
+uses docker & localkube on Linux hosts. As a result, resource utilization is
+significantly reduced.
+
 ```
 git clone https://github.com/kubernetes/minikube.git
 cd minikube
