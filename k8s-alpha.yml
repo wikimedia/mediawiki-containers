@@ -1,0 +1,80 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mediawiki-basic
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service_name: mediawiki-services
+    spec:
+      containers:
+        - name: mediawiki
+          image: wikimedia/mediawiki
+          ports:
+            - containerPort: 80
+          env:
+            - name: MEDIAWIKI_SITE_SERVER
+              value: //localhost
+            - name: MEDIAWIKI_SITE_NAME
+              value: MediaWiki
+            - name: MEDIAWIKI_SITE_LANG
+              value: en
+            - name: MEDIAWIKI_ADMIN_USER
+              value: admin
+            - name: MEDIAWIKI_ADMIN_PASS
+              value: admin
+            - name: MEDIAWIKI_UPDATE
+              value: 'true'
+            - name: MEDIAWIKI_DB_USER
+              value: root
+            - name: MEDIAWIKI_DB_PASSWORD
+              value: password
+            - name: MEDIAWIKI_DB_HOST
+              value: 127.0.0.1
+            - name: MEDIAWIKI_RESTBASE_URL
+              value: http://localhost:7231/localhost/v1
+          volumeMounts:
+            - name: mediawiki-storage
+              mountPath: /data
+            - name: mediawiki-conf
+              mountPath: /conf
+
+        - name: mediawiki-node-services
+          image: wikimedia/mediawiki-node-services
+          env:
+            - name: MEDIAWIKI_API_URL
+              value: http://localhost/api.php
+          ports:
+            - containerPort: 7231
+              protocol: TCP
+          volumeMounts:
+            - name: node-services-storage
+              mountPath: /data
+
+        - name: mysql
+          image: mariadb
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: password
+          ports:
+            - name: mysql
+              containerPort: 3306
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+
+      volumes:
+        - name: node-services-storage
+          hostPath:
+            path: /var/lib/mediawiki-containers/node-services
+        - name: mediawiki-storage
+          hostPath:
+            path: /var/lib/mediawiki-containers/mediawiki
+        - name: mysql-storage
+          hostPath:
+            path: /var/lib/mediawiki-containers/mysql
+        - name: mediawiki-conf
+          hostPath:
+            path: /home/gabriel/src/mediawiki-containers/conf/mediawiki
