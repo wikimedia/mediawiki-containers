@@ -11,9 +11,8 @@ git clone git@github.com:wikimedia/mediawiki-containers.git
 cd mediawiki-containers
 git checkout k8s
 
-# Temporary work-around: Modify the absolute path to your mediawiki-containers
-# checkout at the end of k8s-alpha.yml to reflect your checkout
-vim k8s-alpha.yml
+# Load the MediaWiki configuration into kubernetes
+kubectl create configmap mediawiki-conf-1 --from-file=conf/mediawiki
 
 # start cluster
 kubectl create -f k8s-alpha.yml

@@ -70,6 +70,5 @@ spec:
           hostPath:
             path: /var/lib/mediawiki-containers/mysql
         - name: mediawiki-conf
-          hostPath:
-            # FIXME: Don't use an absolute path here.
-            path: /home/gabriel/src/mediawiki-containers/conf/mediawiki
+          configMap:
+            name: mediawiki-conf-1
