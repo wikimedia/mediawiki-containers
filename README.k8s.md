@@ -17,7 +17,7 @@ kubectl create configmap mediawiki-conf-1 --from-file=conf/mediawiki
 # start cluster
 kubectl create -f k8s-alpha.yml
 # expose as service
-kubectl expose deployment mediawiki-basic --type=LoadBalancer --name=mediawiki
+kubectl expose deployment mediawiki-basic --type=NodePort
 # find the IP
 kubectl get service
 
