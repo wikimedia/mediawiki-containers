@@ -18,10 +18,14 @@ kubectl create configmap mediawiki-conf-1 --from-file=conf/mediawiki
 kubectl create -f k8s-alpha.yml
 # expose as service
 kubectl expose deployment mediawiki-basic --type=NodePort
-# find the IP
+
+# find the minikube IP
+minikube ip
+# find the service port
 kubectl get service
 
-# Browse to http://<ip>/index.php/Main_Page
+# Optionally, check out the Kubernetes dashboard at http://<ip>:8080/ui/
+# Check out your wiki at http://<ip>:<port>/index.php/Main_Page
 ```
 
 ## Optional: Native docker / kubernetes on Debian sid
