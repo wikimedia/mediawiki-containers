@@ -1,13 +1,13 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: mediawiki-basic
+  name: mediawiki-pod
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        service_name: mediawiki-services
+        service_name: mediawiki
     spec:
       containers:
         - name: mediawiki
@@ -77,3 +77,46 @@ spec:
         - name: mediawiki-conf
           configMap:
             name: mediawiki-conf-1
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mediawiki-conf-1
+data:
+  CustomSettings.php: |
+    <?php
+    
+    /**
+     * VisualEditor
+     */
+    require_once "/usr/src/mediawiki/extensions/VisualEditor/VisualEditor.php";
+    $wgDefaultUserOptions['visualeditor-enable'] = 1;
+    $wgHiddenPrefs[] = 'visualeditor-enable';
+    $wgVirtualRestConfig['modules']['restbase'] = array(
+      'url' => 'http://localhost:7231',
+      'domain' => 'localhost',
+      'forwardCookies' => true,
+      'parsoidCompat' => false
+    );
+
+    /**
+     * Math
+     */
+    $wgDefaultUserOptions['math'] = 'mathml';
+    $wgMathFullRestbaseURL = 'http://localhost:7231/localhost/';
+    wfLoadExtension( 'Math' );
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mediawiki-svc
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    service_name: mediawiki
