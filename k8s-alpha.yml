@@ -80,6 +80,9 @@ spec:
 
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mediawiki-conf-1
 data:
   CustomSettings.php: |
     <?php
@@ -96,9 +99,13 @@ data:
       'forwardCookies' => true,
       'parsoidCompat' => false
     );
-kind: ConfigMap
-metadata:
-  name: mediawiki-conf-1
+
+    /**
+     * Math
+     */
+    $wgDefaultUserOptions['math'] = 'mathml';
+    $wgMathFullRestbaseURL = 'http://localhost:7231/localhost/';
+    wfLoadExtension( 'Math' );
 
 ---
 apiVersion: v1
