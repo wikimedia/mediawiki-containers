@@ -50,6 +50,11 @@ spec:
             - name: node-services-storage
               mountPath: /data
 
+        - name: mathoid
+          image: wikimedia/mathoid:24b660f09
+          ports:
+            - containerPort: 10044
+
         - name: mysql
           image: mariadb
           env:
