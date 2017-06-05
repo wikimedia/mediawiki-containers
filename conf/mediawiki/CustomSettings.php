@@ -13,3 +13,12 @@ $wgVirtualRestConfig['modules']['restbase'] = array(
 	'forwardCookies' => true,
 	'parsoidCompat' => false
 );
+
+/**
+ * Math
+ */
+$wgDefaultUserOptions['math'] = 'mathml';
+$wgMathFullRestbaseURL = 'http://localhost:7231/localhost/';
+wfLoadExtension( 'Math' );
+
+?>
