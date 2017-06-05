@@ -34,7 +34,7 @@ spec:
             - name: MEDIAWIKI_DB_HOST
               value: 127.0.0.1
             - name: MEDIAWIKI_RESTBASE_URL
-              value: http://localhost:7231/api/rest_v1
+              value: http://localhost:7231/localhost/v1
           volumeMounts:
             - name: mediawiki-storage
               mountPath: /data
