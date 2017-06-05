@@ -49,12 +49,11 @@ metadata:
 data:
   CustomSettings.php: |
     <?php
-    
+
     /**
      * VisualEditor
      */
     wfLoadExtension( 'VisualEditor' );
-
     $wgDefaultUserOptions['visualeditor-enable'] = 1;
     $wgHiddenPrefs[] = 'visualeditor-enable';
     $wgVirtualRestConfig['modules']['restbase'] = array(
@@ -67,11 +66,9 @@ data:
     /**
      * Math
      */
-    #wfLoadExtension( 'Math' );
-    #$wgMathValidModes[] = 'mathml';
-    #$wgDefaultUserOptions['math'] = 'mathml';
-    #$wgMathFullRestbaseURL = 'http://restbase-svc:7231/localhost/';
-    #unset($GLOBALS['wgMathMathMLUrl']);
+    $wgDefaultUserOptions['math'] = 'mathml';
+    $wgMathFullRestbaseURL = 'http://restbase-svc:7231/localhost/';
+    wfLoadExtension( 'Math' );
 
 ---
 apiVersion: apps/v1beta1
