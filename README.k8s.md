@@ -1,7 +1,7 @@
 # WIP Kubernetes setup instructions
 
-1) Set up minikube (also see optional / experimental native Linux support
-instructions below).
+1) Set up [minikube](https://github.com/kubernetes/minikube) (also see
+optional / experimental native Linux support instructions below).
 2) Start the mediawiki-containers Kubernetes cluster. From within the minikube
 environment (native shell when using native Docker):
 
@@ -11,13 +11,8 @@ git clone git@github.com:wikimedia/mediawiki-containers.git
 cd mediawiki-containers
 git checkout k8s
 
-# Load the MediaWiki configuration into kubernetes
-kubectl create configmap mediawiki-conf-1 --from-file=conf/mediawiki
-
 # start cluster
-kubectl create -f k8s-alpha.yml
-# expose as service
-kubectl expose deployment mediawiki-basic --type=NodePort
+kubectl apply -f k8s-alpha.yml
 
 # find the minikube IP
 minikube ip
