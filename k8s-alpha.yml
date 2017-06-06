@@ -253,10 +253,15 @@ spec:
             value: '9092'
           - name: KAFKA_ZOOKEEPER_CONNECT
             value: localhost:2181
+          - name: KAFKA_HEAP_OPTS
+            value: "-Xmx200m -Xms200m"
       - name: zookeeper
         image: wurstmeister/zookeeper
         ports:
         - containerPort: 2181
+        env:
+          - name: ZOOKEEPER_HEAP_OPTS
+            value: "-Xmx50m -Xms50m"
 ---
 apiVersion: v1
 kind: Service
