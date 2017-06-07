@@ -162,10 +162,12 @@ spec:
     spec:
       containers:
         - name: mediawiki-node-services
-          image: wikimedia/mediawiki-node-services:0.2.1
+          image: wikimedia/mediawiki-node-services:0.2.2
           env:
             - name: MEDIAWIKI_API_URL
               value: http://mediawiki-svc/api.php
+            - name: MATHOID_HOST_PORT
+              value: http://mathoid-svc:10044
           volumeMounts:
             - name: node-services-storage
               mountPath: /data
