@@ -50,6 +50,7 @@ data:
   CustomSettings.php: |
     <?php
 
+    $wgServer = '//' . $_SERVER['HTTP_HOST'];
     $wgArticlePath = '/wiki/$1';
     $wgScriptPath = '/w';
 
@@ -100,7 +101,7 @@ spec:
             - containerPort: 80
           env:
             - name: MEDIAWIKI_SITE_SERVER
-              value: ''
+              value: 'configured-in-CustomSettings.php'
             - name: MEDIAWIKI_SITE_NAME
               value: MediaWiki
             - name: MEDIAWIKI_SITE_LANG
