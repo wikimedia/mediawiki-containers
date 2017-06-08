@@ -92,7 +92,7 @@ spec:
     spec:
       containers:
         - name: mediawiki
-          image: wikimedia/mediawiki:1.30.0-wmf3
+          image: wikimedia/mediawiki:1.30.0-wmf3-1
           ports:
             - containerPort: 80
           env:
