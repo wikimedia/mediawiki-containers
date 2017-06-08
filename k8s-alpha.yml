@@ -50,6 +50,9 @@ data:
   CustomSettings.php: |
     <?php
 
+    $wgArticlePath = '/wiki/$1';
+    $wgScriptPath = '/w';
+
     /**
      * VisualEditor
      */
@@ -92,7 +95,7 @@ spec:
     spec:
       containers:
         - name: mediawiki
-          image: wikimedia/mediawiki:1.30.0-wmf3-1
+          image: wikimedia/mediawiki:1.30.0-wmf3-2
           ports:
             - containerPort: 80
           env:
