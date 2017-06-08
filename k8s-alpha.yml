@@ -54,6 +54,9 @@ data:
     $wgArticlePath = '/wiki/$1';
     $wgScriptPath = '/w';
 
+    # Enable database caching
+    $wgMainCacheType = CACHE_DB;
+
     /**
      * VisualEditor
      */
