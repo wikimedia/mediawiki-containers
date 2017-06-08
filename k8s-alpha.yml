@@ -72,10 +72,10 @@ data:
     /**
      * Math
      */
-    #wfLoadExtension( 'Math' );
-    #$wgMathValidModes[] = 'mathml';
-    #$wgDefaultUserOptions['math'] = 'mathml';
-    #$wgMathFullRestbaseURL = 'http://restbase-svc:7231/localhost/';
+    wfLoadExtension( 'Math' );
+    $wgMathValidModes[] = 'mathml';
+    $wgDefaultUserOptions['math'] = 'mathml';
+    $wgMathFullRestbaseURL = '/api/rest_';
     #unset($GLOBALS['wgMathMathMLUrl']);
 
 ---
