@@ -58,9 +58,13 @@ data:
     $wgMainCacheType = CACHE_DB;
 
     /**
-     * VisualEditor
+     * VisualEditor, Citoid and co
      */
     wfLoadExtension( 'VisualEditor' );
+    wfLoadExtension( 'ParserFunctions' );
+    wfLoadExtension( 'TemplateData' );
+    wfLoadExtension( 'Cite' );
+    wfLoadExtension( 'Citoid' );
     $wgDefaultUserOptions['visualeditor-enable'] = 1;
     $wgHiddenPrefs[] = 'visualeditor-enable';
     $wgVirtualRestConfig['modules']['restbase'] = array(
@@ -85,6 +89,13 @@ data:
     $wgMathFullRestbaseURL = '/api/rest_';
     #unset($GLOBALS['wgMathMathMLUrl']);
 
+    /**
+     * Mobile Content Service
+     */
+    wfLoadExtension( 'MobileFrontend' );
+    wfLoadExtension( 'TextExtracts' );
+    wfLoadExtension( 'PageImages' );
+
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
@@ -99,7 +110,7 @@ spec:
     spec:
       containers:
         - name: mediawiki
-          image: wikimedia/mediawiki:1.30.0-wmf3-3
+          image: wikimedia/mediawiki:1.30.0-wmf4
           ports:
             - containerPort: 80
           env:
@@ -169,12 +180,16 @@ spec:
     spec:
       containers:
         - name: mediawiki-node-services
-          image: wikimedia/mediawiki-node-services:0.2.2
+          image: wikimedia/mediawiki-node-services:0.2.3
           env:
             - name: MEDIAWIKI_API_URL
               value: http://mediawiki-svc/api.php
             - name: MATHOID_HOST_PORT
               value: http://mathoid-svc:10044
+            - name: MOBILEAPPS_URI
+              value: http://mobileapps-svc:8888
+            - name: CITOID_URI
+              value: http://citoid-svc:1970
           volumeMounts:
             - name: node-services-storage
               mountPath: /data
@@ -230,6 +245,81 @@ spec:
     service_name: mathoid
 
 # END Mathoid
+
+---
+# BEGIN Citoid
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: citoid-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service_name: citoid
+    spec:
+      containers:
+        - name: citoid
+          image: wikimedia/citoid:f321c30
+          ports:
+            - containerPort: 1970
+        - name: zotero
+          image: wikimedia/zotero:f051fe7
+          ports:
+            - containerPort: 1969
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: citoid-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 1970
+    protocol: TCP
+  selector:
+    service_name: citoid
+
+# END Citoid
+
+---
+# BEGIN Mobile Content Service
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mobileapps-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service_name: mobileapps
+    spec:
+      containers:
+        - name: mobileapps
+          image: wikimedia/mobile-content-service:32202ba
+          env:
+            - name: MWAPI_URI
+              value: http://mediawiki-svc/api.php
+            - name: RESTBASE_URI
+              value: http://restbase-svc:7231/localhost/v1/{+path}
+          ports:
+            - containerPort: 8888
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mobileapps-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8888
+    protocol: TCP
+  selector:
+    service_name: mobileapps
+
+# END Mobile Content Service
 
 ---
 # Begin ChangeProp
