@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+import argparse
+
+def develop(args):
+    """
+    Prepare a service for development:
+    - Check out service repository (in src/)
+    - Mount checkout inside service container
+    """
+    print 'develop', args
+
+def apply(args):
+    """
+    Apply a change in the dev environment
+    - Check whether the service is already checked out / "develop" was called
+    - Update dependencies inside container
+    - If necessary, restart service.
+    """
+    print 'apply', args
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Install and drive the mediawiki-containers development environment.')
+    subparsers = parser.add_subparsers(help='Available commands')
+
+    # create the parser for the "develop" command
+    parser_develop = subparsers.add_parser('develop', 
+            help='Prepare a service for development')
+    parser_develop.add_argument('service', nargs='+', 
+        help='Name of service you would like to develop')
+    parser_develop.set_defaults(func=develop)
+
+    # create the parser for the "apply" command
+    parser_apply = subparsers.add_parser('apply', 
+            help='Apply a change in the dev environment')
+    parser_apply.add_argument('service', nargs='+', 
+        help='Name of service whose changes you would like to apply.')
+    parser_apply.set_defaults(func=apply)
+
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == '__main__':
+    main()
+
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
