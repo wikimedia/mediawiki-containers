@@ -1,5 +1,27 @@
 #!/usr/bin/env python
 import argparse
+import subprocess
+from subprocess import check_output, Popen, PIPE, STDOUT
+
+
+def get_minikube_ip():
+    """
+    Get the minikube ip
+    """
+    # XXX: Sudo is needed on Linux. What about OSX and Win?
+    return check_output(['sudo', 'minikube', 'ip'])
+
+def kubectl_apply_config(config):
+    cmd = ['kubectl', 'apply', '-f', '-']
+    p = Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=STDOUT)    
+    stdout = p.communicate(input=config)[0]
+    if p.returncode != 0:
+        raise subprocess.CalledProcessError(p.returncode, cmd, stdout)
+    return stdout
+
+def kubectl_delete_config(config):
+    p = Popen(['kubectl', 'delete', '-f', '-'], stdout=PIPE, stdin=PIPE, stderr=STDOUT)    
+    return p.communicate(input=config)[0]
 
 def develop(args):
     """
@@ -16,7 +38,8 @@ def apply(args):
     - Update dependencies inside container
     - If necessary, restart service.
     """
-    print 'apply', args
+    print kubectl_apply_config('foo');
+    print 'apply', args, get_minikube_ip()
 
 
 def main():
