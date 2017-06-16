@@ -23,7 +23,7 @@ def kubectl_delete_config(config):
     p = Popen(['kubectl', 'delete', '-f', '-'], stdout=PIPE, stdin=PIPE, stderr=STDOUT)    
     return p.communicate(input=config)[0]
 
-def develop(args):
+def cmd_develop(args):
     """
     Prepare a service for development:
     - Check out service repository (in src/)
@@ -31,7 +31,7 @@ def develop(args):
     """
     print 'develop', args
 
-def apply(args):
+def cmd_apply(args):
     """
     Apply a change in the dev environment
     - Check whether the service is already checked out / "develop" was called
@@ -40,6 +40,17 @@ def apply(args):
     """
     print kubectl_apply_config('foo');
     print 'apply', args, get_minikube_ip()
+
+def cmd_test(args):
+    """
+    Spin up a new container for this service, and run tests.
+    - Check whether the service is already checked out / "develop" was called
+    - Spin up a new container
+    - Update dependencies inside container
+    - If necessary, restart service.
+    - run test command
+    """
+    print 'test', args, get_minikube_ip()
 
 
 def main():
@@ -52,14 +63,21 @@ def main():
             help='Prepare a service for development')
     parser_develop.add_argument('service', nargs='+', 
         help='Name of service you would like to develop')
-    parser_develop.set_defaults(func=develop)
+    parser_develop.set_defaults(func=cmd_develop)
 
     # create the parser for the "apply" command
     parser_apply = subparsers.add_parser('apply', 
             help='Apply a change in the dev environment')
     parser_apply.add_argument('service', nargs='+', 
         help='Name of service whose changes you would like to apply.')
-    parser_apply.set_defaults(func=apply)
+    parser_apply.set_defaults(func=cmd_apply)
+
+    # create the parser for the "test" command
+    parser_apply = subparsers.add_parser('test', 
+            help='Test a service in a fresh container.')
+    parser_apply.add_argument('service', nargs='+', 
+        help='Name of service whose changes you would like to test.')
+    parser_apply.set_defaults(func=cmd_test)
 
     args = parser.parse_args()
     args.func(args)
