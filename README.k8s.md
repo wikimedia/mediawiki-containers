@@ -9,10 +9,9 @@ environment (native shell when using native Docker):
 # Clone k8s branch of mediawiki-containers
 git clone git@github.com:wikimedia/mediawiki-containers.git
 cd mediawiki-containers
-git checkout k8s
 
 # start cluster
-kubectl apply -f k8s-alpha.yml
+kubectl apply -f mediawiki-dev.yaml
 
 # find the minikube IP
 minikube ip
@@ -39,3 +38,8 @@ sudo ln -s `pwd`/out/* /usr/local/bin
 sudo ln -s /etc/systemd/system /usr/lib/systemd/system # minikube assumes non-etc location
 sudo CHANGE_MINIKUBE_NONE_USER=true minikube start --vm-driver=none --use-vendored-driver
 ```
+
+## Issue tracking
+
+We use [Phabricator to track
+issues](https://phabricator.wikimedia.org/maniphest/task/create/?projects=PHID-PROJ-aww3pxjms7btyttwtz2r). See the [list of current issues](https://phabricator.wikimedia.org/maniphest/?project=PHID-PROJ-aww3pxjms7btyttwtz2r&statuses=open&group=none&order=newest#R).
