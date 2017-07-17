@@ -80,6 +80,7 @@ start () {
         --name=mediawiki \
         -v `pwd`/conf/mediawiki:/conf:ro \
         -v $DATADIR/mediawiki:/data:rw \
+        -v $DATADIR/images:/usr/src/mediawiki/images:rw \
         -e MEDIAWIKI_SITE_SERVER="//$MEDIAWIKI_DOMAIN" \
         -e MEDIAWIKI_SITE_NAME=MediaWiki \
         -e MEDIAWIKI_SITE_LANG=en \
