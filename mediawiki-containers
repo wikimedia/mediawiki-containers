@@ -88,8 +88,8 @@ start () {
         -e MEDIAWIKI_ADMIN_PASS=$MEDIAWIKI_ADMIN_PASS \
         -e MEDIAWIKI_UPDATE=true \
         -e MEDIAWIKI_DB_USER=root \
-        -e MEDIAWIKI_DB_HOST=mysql.docker \
         -e MEDIAWIKI_DB_PASSWORD=password \
+        -e MEDIAWIKI_DB_HOST=mysql.docker \
         -e MEDIAWIKI_RESTBASE_URL=http://mediawiki-node-services.docker:7231/localhost/v1 \
         --dns "$DNS" \
         -p 80:80 \

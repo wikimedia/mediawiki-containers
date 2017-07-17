@@ -38,6 +38,11 @@ starts on boot. [Here is a
 screencast](https://people.wikimedia.org/~gwicke/mediawiki-containers-install.ogv)
 of an installer run.
 
+## Issue tracking
+
+We use [Phabricator to track
+issues](https://phabricator.wikimedia.org/maniphest/task/create/?projects=PHID-PROJ-aww3pxjms7btyttwtz2r). See the [list of current issues](https://phabricator.wikimedia.org/maniphest/?project=PHID-PROJ-aww3pxjms7btyttwtz2r&statuses=open&group=none&order=newest#R).
+
 ## Architecture
 
 Running `sudo ./mediawiki-containers start` in a checkout of this repository will

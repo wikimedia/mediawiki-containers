@@ -1,0 +1,428 @@
+# BEGIN MySQL
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mysql-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service_name: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mariadb
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: password
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+
+      volumes:
+        - name: mysql-storage
+          hostPath:
+            path: /var/lib/mediawiki-containers/mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3306
+  selector:
+    service_name: mysql
+
+# END MySQL
+
+---
+# BEGIN MediaWiki
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mediawiki-conf-1
+data:
+  CustomSettings.php: |
+    <?php
+
+    $wgServer = '//' . $_SERVER['HTTP_HOST'];
+    $wgArticlePath = '/wiki/$1';
+    $wgScriptPath = '/w';
+
+    # Enable database caching
+    $wgMainCacheType = CACHE_DB;
+
+    /**
+     * VisualEditor, Citoid and co
+     */
+    wfLoadExtension( 'VisualEditor' );
+    wfLoadExtension( 'ParserFunctions' );
+    wfLoadExtension( 'TemplateData' );
+    wfLoadExtension( 'Cite' );
+    wfLoadExtension( 'Citoid' );
+    $wgDefaultUserOptions['visualeditor-enable'] = 1;
+    $wgHiddenPrefs[] = 'visualeditor-enable';
+    $wgVirtualRestConfig['modules']['restbase'] = array(
+      'url' => 'http://restbase-svc:7231',
+      'domain' => 'localhost',
+      'forwardCookies' => true,
+      'parsoidCompat' => false
+    );
+
+    /**
+     * ChangeProp and EventBus
+     */
+    wfLoadExtension( 'EventBus' );
+    $wgEventServiceUrl = "http://eventlogging-service-svc:8085/v1/events";
+
+    /**
+     * Math
+     */
+    wfLoadExtension( 'Math' );
+    $wgMathValidModes[] = 'mathml';
+    $wgDefaultUserOptions['math'] = 'mathml';
+    $wgMathFullRestbaseURL = '/api/rest_';
+    #unset($GLOBALS['wgMathMathMLUrl']);
+
+    /**
+     * Mobile Content Service
+     */
+    wfLoadExtension( 'MobileFrontend' );
+    wfLoadExtension( 'TextExtracts' );
+    wfLoadExtension( 'PageImages' );
+
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mediawiki-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service_name: mediawiki
+    spec:
+      containers:
+        - name: mediawiki
+          image: wikimedia/mediawiki:1.30.0-wmf4
+          ports:
+            - containerPort: 80
+          env:
+            - name: MEDIAWIKI_SITE_SERVER
+              value: 'configured-in-CustomSettings.php'
+            - name: MEDIAWIKI_SITE_NAME
+              value: MediaWiki
+            - name: MEDIAWIKI_SITE_LANG
+              value: en
+            - name: MEDIAWIKI_ADMIN_USER
+              value: admin
+            - name: MEDIAWIKI_ADMIN_PASS
+              value: admin
+            - name: MEDIAWIKI_UPDATE
+              value: 'true'
+            - name: MEDIAWIKI_DB_TYPE
+              value: mysql
+            - name: MEDIAWIKI_DB_USER
+              value: root
+            - name: MEDIAWIKI_DB_PASSWORD
+              value: password
+            - name: MEDIAWIKI_DB_HOST
+              value: mysql-svc
+            - name: MEDIAWIKI_RESTBASE_URL
+              value: http://restbase-svc:7231/localhost/v1
+          volumeMounts:
+            - name: mediawiki-storage
+              mountPath: /data
+            - name: mediawiki-conf
+              mountPath: /conf
+
+      volumes:
+        - name: mediawiki-storage
+          hostPath:
+            path: /var/lib/mediawiki-containers/mediawiki
+        - name: mediawiki-conf
+          configMap:
+            name: mediawiki-conf-1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mediawiki-svc
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    service_name: mediawiki
+
+# END MediaWiki
+---
+# BEGIN RESTBase
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: restbase-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service_name: restbase
+    spec:
+      containers:
+        - name: mediawiki-node-services
+          image: wikimedia/mediawiki-node-services:0.2.3
+          env:
+            - name: MEDIAWIKI_API_URL
+              value: http://mediawiki-svc/api.php
+            - name: MATHOID_HOST_PORT
+              value: http://mathoid-svc:10044
+            - name: MOBILEAPPS_URI
+              value: http://mobileapps-svc:8888
+            - name: CITOID_URI
+              value: http://citoid-svc:1970
+          volumeMounts:
+            - name: node-services-storage
+              mountPath: /data
+
+      volumes:
+        - name: node-services-storage
+          hostPath:
+            path: /var/lib/mediawiki-containers/node-services
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: restbase-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 7231
+    protocol: TCP
+  selector:
+    service_name: restbase
+
+# END RESTBase
+
+---
+# BEGIN Mathoid
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mathoid-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service_name: mathoid
+    spec:
+      containers:
+        - name: mathoid
+          image: wikimedia/mathoid:24b660f09
+          ports:
+            - containerPort: 10044
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathoid-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 10044
+    protocol: TCP
+  selector:
+    service_name: mathoid
+
+# END Mathoid
+
+---
+# BEGIN Citoid
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: citoid-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service_name: citoid
+    spec:
+      containers:
+        - name: citoid
+          image: wikimedia/citoid:f321c30
+          ports:
+            - containerPort: 1970
+        - name: zotero
+          image: wikimedia/zotero:f051fe7
+          ports:
+            - containerPort: 1969
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: citoid-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 1970
+    protocol: TCP
+  selector:
+    service_name: citoid
+
+# END Citoid
+
+---
+# BEGIN Mobile Content Service
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mobileapps-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service_name: mobileapps
+    spec:
+      containers:
+        - name: mobileapps
+          image: wikimedia/mobile-content-service:32202ba
+          env:
+            - name: MWAPI_URI
+              value: http://mediawiki-svc/api.php
+            - name: RESTBASE_URI
+              value: http://restbase-svc:7231/localhost/v1/{+path}
+          ports:
+            - containerPort: 8888
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mobileapps-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8888
+    protocol: TCP
+  selector:
+    service_name: mobileapps
+
+# END Mobile Content Service
+
+---
+# Begin ChangeProp
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: kafka-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service_name: kafka
+    spec:
+      containers:
+      - name: kafka
+        image: wurstmeister/kafka:0.9.0.1-1
+        ports:
+        - containerPort: 9092
+        env:
+          - name: KAFKA_BROKER_ID
+            value: '1'
+          - name: KAFKA_ADVERTISED_HOST_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: KAFKA_PORT
+            value: '9092'
+          - name: KAFKA_ADVERTISED_PORT
+            value: '9092'
+          - name: KAFKA_ZOOKEEPER_CONNECT
+            value: localhost:2181
+          - name: KAFKA_HEAP_OPTS
+            value: "-Xmx200m -Xms200m"
+      - name: zookeeper
+        image: wurstmeister/zookeeper
+        ports:
+        - containerPort: 2181
+        env:
+          - name: ZOOKEEPER_HEAP_OPTS
+            value: "-Xmx50m -Xms50m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-svc
+spec:
+  type: ClusterIP
+  ports:
+  - name: kafka-port
+    port: 9092
+  selector:
+    service_name: kafka
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: eventlogging-service-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service_name: eventlogging-service
+    spec:
+      containers:
+      - name: eventlogging-service
+        image: wikimedia/eventlogging-service
+        args:
+        - kafka:///kafka-svc:9092?async=False&sync_timeout=10.0&topic=eqiad.{meta[topic]}&api_version=0.9
+        ports:
+        - containerPort: 8085
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eventlogging-service-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8085
+  selector:
+    service_name: eventlogging-service
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: change-propagation-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service_name: change-propagation
+    spec:
+      containers:
+      - name: change-propagation
+        image: wikimedia/change-propagation
+        env:
+          - name: MEDIAWIKI_URL
+            value: http://mediawiki-svc
+          - name: RESTBASE_URL
+            value: http://restbase-svc:7231
+          - name: KAFKA_BROKER_LIST
+            value: kafka-svc:9092
+# End Change-Prop
