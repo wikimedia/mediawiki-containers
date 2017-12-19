@@ -228,7 +228,7 @@ spec:
     spec:
       containers:
         - name: mathoid
-          image: wikimedia/mathoid:24b660f09
+          image: wikimedia/mathoid:bad5ec8d4
           ports:
             - containerPort: 10044
 ---
@@ -261,11 +261,11 @@ spec:
     spec:
       containers:
         - name: citoid
-          image: wikimedia/citoid:f321c30
+          image: wikimedia/citoid:d0087e2
           ports:
             - containerPort: 1970
         - name: zotero
-          image: wikimedia/zotero:f051fe7
+          image: wikimedia/zotero:3044b3ae
           ports:
             - containerPort: 1969
 ---
@@ -298,7 +298,7 @@ spec:
     spec:
       containers:
         - name: mobileapps
-          image: wikimedia/mobile-content-service:32202ba
+          image: wikimedia/mobile-content-service:ff74bb1
           env:
             - name: MWAPI_URI
               value: http://mediawiki-svc/api.php
