@@ -1,0 +1,102 @@
+#!/bin/bash
+
+
+declare minikube=$(which minikube);
+declare kubectl=$(which kubectl);
+declare workdir=$(cd $(dirname $0)/.. && pwd);
+
+
+start_minikube() {
+	local sudo_cmd='sudo -E ';
+	local vmdriver='none';
+	if [[ "${OSTYPE}" == "darwin"* ]]; then
+		sudo_cmd='';
+		vmdriver='docker-machine-driver-xhyve';
+	fi
+	# set the env
+	export MINIKUBE_WANTUPDATENOTIFICATION=false;
+	export MINIKUBE_WANTREPORTERRORPROMPT=false;
+	export MINIKUBE_HOME=$HOME;
+	export CHANGE_MINIKUBE_NONE_USER=true;
+	mkdir $HOME/.kube &> /dev/null || true;
+	touch $HOME/.kube/config;
+
+	echo "[*] Starting minikube ...";
+	export KUBECONFIG=$HOME/.kube/config;
+	${sudo_cmd}${minikube} start --vm-driver=${vmdriver};
+	if [[ $? != 0 ]]; then
+		exit 2;
+	fi
+
+	echo -n "[*] Waiting for the cluster to become available ";
+	for i in {1..150}; do
+		${kubectl} get pods &> /dev/null;
+		if [[ $? != 1 ]]; then
+			break;
+		fi
+		echo -n ".";
+		sleep 2;
+	done
+	echo;
+}
+
+
+if [[ -z "${minikube}" || -z "${kubectl}" ]]; then
+	echo "minikube and/or kubectl commands not found!" > 2;
+	exit 1;
+fi
+
+${minikube} status &> /dev/null;
+if [[ $? != 0 ]]; then
+	start_minikube;
+	if [[ $? != 0 ]]; then
+		echo "Could not start the cluster!" > 2;
+		exit 2;
+	fi
+fi
+
+echo "[*] Applying mediawiki-containers ...";
+${kubectl} apply -f ${workdir}/mediawiki-dev.yaml;
+echo;
+sleep 1;
+
+declare ip=$(minikube ip);
+declare port=$(${kubectl} get services | grep mediawiki-svc | cut -d':' -f2 | cut -d'/' -f1);
+declare url="http://${ip}:${port}/wiki/Main_Page";
+declare get_cmd=$(which curl);
+
+if [[ -z "${get_cmd}" ]]; then
+	get_cmd=$(which wget);
+	if [[ -z "${get_cmd}" ]]; then
+		# we can't check the URL, so exit now
+		echo "Please wait until all of the containers have been started, at which";
+		echo "point you can access the MediaWiki instance at ${url}";
+		exit 0;
+	fi
+	get_cmd="${get_cmd} -O -";
+fi
+
+echo -n "[*] Waiting on the cluster to settle ";
+declare attempt=0;
+while true; do
+	echo -n '.';
+	${get_cmd} ${url} &> /dev/null;
+	if [[ $? == 0 ]]; then
+		break;
+	fi
+	if [[ $((attempt++)) -gt 300 ]]; then
+		# we waited more than 10 minutes, it's time we gave up
+		echo;
+		echo "Timed out while waiting for the cluster to become available!";
+		echo "Please wait until all of the containers have been started, at which";
+		echo "point you can access the MediaWiki instance at ${url}";
+		exit 0;
+	fi
+	sleep 2;
+done
+echo;
+
+echo "The cluster is ready. You can access your instance at ${url}";
+
+exit 0;
+
